@@ -1,7 +1,10 @@
+using WarehouseManagementSystem.Data.Context;
+
 namespace Warehouse.Forms
 {
     internal static class Program
     {
+
         /// <summary>
         ///  The main entry point for the application.
         /// </summary>
@@ -11,7 +14,7 @@ namespace Warehouse.Forms
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
             ApplicationConfiguration.Initialize();
-            Application.Run(new Form1());
+            Application.Run(new MainForm());
         }
     }
 }
