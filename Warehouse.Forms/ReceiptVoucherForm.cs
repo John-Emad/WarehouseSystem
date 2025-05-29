@@ -79,7 +79,6 @@ namespace WarehouseManagmentSystem.WinForms
             }).ToList();
             ReceiptVoucherItemsGridView.DataSource = viewList;
         }
-
         private void ResetEnteredItemData()
         {
             ReceiptVoucherProductionDate.Value = DateTime.Now;
@@ -87,7 +86,6 @@ namespace WarehouseManagmentSystem.WinForms
             ReceiptVoucherItemsComboBox.SelectedIndex = -1;
             ReceiptVoucherQuantityTextBox.Clear();
         }
-
         private void ResetEnteredReceiptData()
         {
             ReceiptVoucherSupplierComboBox.SelectedIndex = -1;
@@ -99,7 +97,6 @@ namespace WarehouseManagmentSystem.WinForms
             InventoryItemViewDTOList.Clear();
             UpdateItemsGridView();
         }
-
         private async void ReceiptVoucherAddToWarehouseButton_ClickAsync(object sender, EventArgs e)
         {
             if (!IsValidReceipt())
@@ -113,8 +110,8 @@ namespace WarehouseManagmentSystem.WinForms
                 var existing = existingItems.FirstOrDefault(i =>
                     i.ItemCode == item.ItemCode &&
                     i.WarehouseId == warehouseId &&
-                    i.ProductionDate.Date == item.ProductionDate.Date &&
-                    i.ExpiryDate.Date == item.ExpiryDate.Date);
+                    i.ProductionDate == DateOnly.FromDateTime(item.ProductionDate.Date) &&
+                    i.ExpiryDate == DateOnly.FromDateTime(item.ExpiryDate.Date));
 
                 if (existing != null)
                 {
@@ -127,8 +124,8 @@ namespace WarehouseManagmentSystem.WinForms
                     {
                         ItemCode = item.ItemCode,
                         WarehouseId = warehouseId,
-                        ProductionDate = item.ProductionDate,
-                        ExpiryDate = item.ExpiryDate,
+                        ProductionDate = DateOnly.FromDateTime(item.ProductionDate),
+                        ExpiryDate = DateOnly.FromDateTime(item.ExpiryDate),
                         Quantity = item.Quantity
                     };
                     await _inventoryItemRepository.AddAsync(inventoryItem);
@@ -139,12 +136,11 @@ namespace WarehouseManagmentSystem.WinForms
             ResetEnteredReceiptData();
 
         }
-
         private async Task AddToReceiptVoucherAndDetailsTables()
         {
             var receiptVoucher = new ReceiptVoucher
             {
-                Date = ReceiptVoucherReceiptDate.Value,
+                Date = DateOnly.FromDateTime(ReceiptVoucherReceiptDate.Value),
                 SupplierId = (int)ReceiptVoucherSupplierComboBox.SelectedValue,
                 WarehouseId = (int)ReceiptVoucherWarehouseComboBox.SelectedValue
             };
@@ -157,8 +153,8 @@ namespace WarehouseManagmentSystem.WinForms
                     VoucherId = receiptVoucher.Id,
                     ItemCode = dto.ItemCode,
                     Quantity = dto.Quantity,
-                    ProductionDate = dto.ProductionDate,
-                    ExpiryDate = dto.ExpiryDate
+                    ProductionDate = DateOnly.FromDateTime(dto.ProductionDate),
+                    ExpiryDate = DateOnly.FromDateTime(dto.ExpiryDate)
                 };
 
                 await _receiptVoucherDetailsRepository.AddAsync(detail);
@@ -244,12 +240,10 @@ namespace WarehouseManagmentSystem.WinForms
             UpdateItemsGridView();
             ResetEnteredItemData();
         }
-
         private void ReceiptVoucherWarehouseComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             UserChosenWarehouseViewLabel.Text = ReceiptVoucherWarehouseComboBox.Text;
         }
-
         private void ReceiptVoucherSupplierComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             UserChosenSupplierViewLabel.Text = ReceiptVoucherSupplierComboBox.Text;

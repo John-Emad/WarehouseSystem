@@ -6,6 +6,5 @@ namespace WarehouseManagementSystem.Domain.Models
     public class Supplier : Person
     {
         public virtual ICollection<ReceiptVoucher> ReceiptVouchers { get; set; }
-        public virtual ICollection<TransferVoucher> TransferVouchers { get; set; }
     }
 }

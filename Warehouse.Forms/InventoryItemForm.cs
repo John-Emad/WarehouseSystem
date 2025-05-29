@@ -88,8 +88,8 @@ namespace WarehouseManagmentSystem.WinForms
                 var inventoryItem = new WarehouseManagementSystem.Domain.Models.InventoryItem
                 {
                     Quantity = decimal.Parse(InventoryItemQuantityTextBox.Text),
-                    ProductionDate = productionDate,
-                    ExpiryDate = expiryDate,
+                    ProductionDate = DateOnly.FromDateTime(productionDate),
+                    ExpiryDate = DateOnly.FromDateTime(expiryDate),
                     WarehouseId = (int)InventoryItemWarehouseComboBox.SelectedValue,
                     ItemCode = (string)InventoryItemNameComboBox.SelectedValue,
                 };

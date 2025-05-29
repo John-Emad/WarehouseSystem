@@ -16,8 +16,8 @@ namespace WarehouseManagementSystem.Domain.Models
         [Range(0, double.MaxValue)]
         public decimal Quantity { get; set; }
 
-        public DateTime ProductionDate { get; set; }
-        public DateTime ExpiryDate { get; set; }
+        public DateOnly ProductionDate { get; set; }
+        public DateOnly ExpiryDate { get; set; }
 
         public virtual Item Item { get; set; }
         public virtual Warehouse Warehouse { get; set; }

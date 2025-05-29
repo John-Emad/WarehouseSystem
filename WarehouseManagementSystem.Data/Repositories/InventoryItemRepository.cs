@@ -16,5 +16,9 @@ namespace WarehouseManagementSystem.Data.Repositories
             _inventoryItemsSet = dbContext.Set<InventoryItem>();
         }
         #endregion
+
+        #region Methods
+
+        #endregion
     }
 }
