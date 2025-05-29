@@ -22,14 +22,10 @@ namespace WarehouseManagementSystem.Domain.Vouchers
         public decimal Quantity { get; set; }
 
         [Required]
-        [StringLength(20)]
-        public string Unit { get; set; }
+        public DateOnly ProductionDate { get; set; }
 
         [Required]
-        public DateTime ProductionDate { get; set; }
-
-        [Required]
-        public DateTime ExpiryDate { get; set; }
+        public DateOnly ExpiryDate { get; set; }
 
         [DeleteBehavior(DeleteBehavior.Cascade)]
         public virtual ReceiptVoucher Voucher { get; set; }

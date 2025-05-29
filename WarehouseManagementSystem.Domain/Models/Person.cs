@@ -12,7 +12,7 @@ namespace WarehouseManagementSystem.Domain.Models
         public string Name { get; set; }
 
         [StringLength(20)]
-        public string? Phone { get; set; }
+        public string? Landline { get; set; }
 
         [StringLength(20)]
         public string? Fax { get; set; }

@@ -22,5 +22,10 @@ namespace WarehouseManagementSystem.Domain.Models
         public virtual ICollection<ReceiptVoucherDetail> ReceiptVoucherDetails { get; set; }
         public virtual ICollection<IssueVoucherDetail> IssueVoucherDetails { get; set; }
         public virtual ICollection<TransferVoucherDetail> TransferVoucherDetails { get; set; }
+
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 }

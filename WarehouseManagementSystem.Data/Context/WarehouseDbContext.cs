@@ -49,7 +49,7 @@ namespace WarehouseManagementSystem.Data.Context
 
                 // Additional configurations that can't be expressed via Data Annotations
                 modelBuilder.Entity<InventoryItem>()
-                    .HasKey(ii => new { ii.ItemCode, ii.WarehouseId });
+                    .HasKey(ii => new { ii.ItemCode, ii.WarehouseId, ii.ProductionDate, ii.ExpiryDate });
 
                 // Configure decimal precision where needed
                 modelBuilder.Entity<ReceiptVoucherDetail>()

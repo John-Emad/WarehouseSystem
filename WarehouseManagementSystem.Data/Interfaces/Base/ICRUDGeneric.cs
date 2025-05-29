@@ -3,21 +3,21 @@ namespace WarehouseManagementSystem.Data.Interfaces.Base
 {
     public interface ICRUDGeneric<T> where T : class
     {
-        Task<T> Add(T entity);
+        Task<T> AddAsync(T entity);
 
-        Task AddRange(ICollection<T> entities);
+        Task AddRangeAsync(ICollection<T> entities);
 
-        Task Update(T entity);
-        Task UpdateRange(ICollection<T> entities);
+        Task UpdateAsync(T entity);
+        Task UpdateRangeAsync(ICollection<T> entities);
 
-        Task<List<T>> GetAll();
+        Task<List<T>> GetAllAsync();
 
-        Task<T> GetByPK(object id);
+        Task<T> GetByPKAsync(object id);
 
         Task Delete(T entity);
 
-        Task DeleteRange(ICollection<T> entities);
+        Task DeleteRangeAsync(ICollection<T> entities);
 
-        Task SaveChanges();
+        Task SaveChangesAsync();
     }
 }

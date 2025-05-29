@@ -18,12 +18,16 @@ namespace WarehouseManagementSystem.Domain.Models
         public string Address { get; set; }
 
         [ForeignKey("ResponsiblePerson")]
-        public int ResponsiblePersonId { get; set; }
+        public int? ResponsiblePersonId { get; set; }
         public virtual Person ResponsiblePerson { get; set; }
 
         public virtual ICollection<InventoryItem> InventoryItems { get; set; }
         public virtual ICollection<ReceiptVoucher> ReceiptVouchers { get; set; }
         public virtual ICollection<IssueVoucher> IssueVouchers { get; set; }
+        public override string ToString()
+        {
+            return Name;
+        }
 
     }
 }

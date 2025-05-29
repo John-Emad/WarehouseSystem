@@ -21,15 +21,17 @@ namespace WarehouseManagementSystem.Domain.Vouchers
         [Range(0.01, double.MaxValue)]
         public decimal Quantity { get; set; }
 
+
+        [ForeignKey("Supplier")]
+        public int? SupplierId { get; set; }
+
+        [DeleteBehavior(DeleteBehavior.Restrict)]
+        public virtual Supplier Supplier { get; set; }
         [Required]
-        [StringLength(20)]
-        public string Unit { get; set; }
+        public DateOnly ProductionDate { get; set; }
 
         [Required]
-        public DateTime ProductionDate { get; set; }
-
-        [Required]
-        public DateTime ExpiryDate { get; set; }
+        public DateOnly ExpiryDate { get; set; }
 
         [DeleteBehavior(DeleteBehavior.Cascade)]
         public virtual TransferVoucher Voucher { get; set; }
