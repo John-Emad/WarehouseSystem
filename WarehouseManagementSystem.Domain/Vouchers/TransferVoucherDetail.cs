@@ -21,9 +21,6 @@ namespace WarehouseManagementSystem.Domain.Vouchers
         [Range(0.01, double.MaxValue)]
         public decimal Quantity { get; set; }
 
-        [Required]
-        [StringLength(20)]
-        public string Unit { get; set; }
 
         [Required]
         public DateTime ProductionDate { get; set; }

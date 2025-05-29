@@ -18,66 +18,60 @@ namespace WarehouseManagementSystem.Data.Repositories.Base
         #endregion
 
         #region Methods
-        public virtual Task<T> Add(T entity)
+        public virtual async Task<T> AddAsync(T entity)
         {
-            _warehouseDbContext.Set<T>().Add(entity);
-            _warehouseDbContext.SaveChanges();
-            return Task.FromResult(entity);
+             await _warehouseDbContext.Set<T>().AddAsync(entity);
+             await _warehouseDbContext.SaveChangesAsync();
+            return entity;
         }
 
-        public virtual Task AddRange(ICollection<T> entities)
+        public virtual async Task AddRangeAsync(ICollection<T> entities)
         {
-            _warehouseDbContext.Set<T>().AddRange(entities);
-            _warehouseDbContext.SaveChanges();
-            return Task.FromResult(entities);
+            await _warehouseDbContext.Set<T>().AddRangeAsync(entities);
+            await _warehouseDbContext.SaveChangesAsync();
         }
 
-        public virtual Task Delete(T entity)
+        public virtual async Task Delete(T entity)
         {
-
             _warehouseDbContext.Set<T>().Remove(entity);
-            _warehouseDbContext.SaveChanges();
-            return Task.FromResult(entity);
+            await _warehouseDbContext.SaveChangesAsync();
         }
 
-        public virtual Task DeleteRange(ICollection<T> entities)
+        public virtual async Task DeleteRangeAsync(ICollection<T> entities)
         {
             foreach (var entity in entities)
             {
                 _warehouseDbContext.Entry(entity).State = EntityState.Deleted;
             }
-            _warehouseDbContext.SaveChanges();
-            return Task.FromResult(entities);
+            await _warehouseDbContext.SaveChangesAsync();
+            
         }
 
-        public virtual Task<List<T>> GetAll()
+        public virtual async Task<List<T>> GetAllAsync()
         {
-            return Task.FromResult(_warehouseDbContext.Set<T>().ToList());
+            return await _warehouseDbContext.Set<T>().ToListAsync();
         }
 
-
-        public virtual Task<T> GetByPK(object id)
+        public virtual async Task<T> GetByPKAsync(object id)
         {
-            return Task.FromResult(_warehouseDbContext.Set<T>().Find(id));
+            return await _warehouseDbContext.Set<T>().FindAsync(id);            
         }
 
-        public Task SaveChanges()
+        public async Task SaveChangesAsync()
         {
-            return Task.FromResult(_warehouseDbContext.SaveChanges());
+             await Task.FromResult(_warehouseDbContext.SaveChangesAsync());
         }
 
-        public virtual Task Update(T entity)
+        public virtual async Task UpdateAsync(T entity)
         {
             _warehouseDbContext.Set<T>().Update(entity);
-            _warehouseDbContext.SaveChanges();
-            return Task.FromResult(entity);
+            await _warehouseDbContext.SaveChangesAsync();
         }
 
-        public Task UpdateRange(ICollection<T> entities)
+        public async Task UpdateRangeAsync(ICollection<T> entities)
         {
             _warehouseDbContext.Set<T>().UpdateRange(entities);
-            _warehouseDbContext.SaveChanges();
-            return Task.FromResult(entities);
+            await _warehouseDbContext.SaveChangesAsync();
         }
         #endregion
     }

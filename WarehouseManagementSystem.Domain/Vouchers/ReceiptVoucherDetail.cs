@@ -22,10 +22,6 @@ namespace WarehouseManagementSystem.Domain.Vouchers
         public decimal Quantity { get; set; }
 
         [Required]
-        [StringLength(20)]
-        public string Unit { get; set; }
-
-        [Required]
         public DateTime ProductionDate { get; set; }
 
         [Required]

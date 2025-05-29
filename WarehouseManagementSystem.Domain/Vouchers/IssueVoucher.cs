@@ -11,10 +11,6 @@ namespace WarehouseManagementSystem.Domain.Vouchers
         public int Id { get; set; }
 
         [Required]
-        [StringLength(50)]
-        public string VoucherNumber { get; set; }
-
-        [Required]
         public DateTime Date { get; set; }
 
         [ForeignKey("Warehouse")]

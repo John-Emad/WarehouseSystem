@@ -1,9 +1,11 @@
 using WarehouseManagementSystem.Data.Context;
+using WarehouseManagementSystem.Domain.Models;
 
-namespace Warehouse.Forms
+namespace WarehouseManagmentSystem.WinForms.Forms
 {
     internal static class Program
     {
+        private static  WarehouseDbContext Context { get; } = new WarehouseDbContext();
 
         /// <summary>
         ///  The main entry point for the application.
@@ -14,7 +16,9 @@ namespace Warehouse.Forms
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
             ApplicationConfiguration.Initialize();
-            Application.Run(new MainForm());
+            bool created = Context.Database.EnsureCreated();
+            Console.WriteLine(created ? "Database created successfully" : "Database already exists");
+            Application.Run(new ReceiptVoucherForm(Context));
         }
     }
 }
