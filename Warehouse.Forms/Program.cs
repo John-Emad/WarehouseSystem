@@ -1,5 +1,6 @@
 using WarehouseManagementSystem.Data.Context;
 using WarehouseManagementSystem.Domain.Models;
+using WarehouseManagmentSystem.WinForms.ReportForms;
 
 namespace WarehouseManagmentSystem.WinForms.Forms
 {
@@ -18,7 +19,7 @@ namespace WarehouseManagmentSystem.WinForms.Forms
             ApplicationConfiguration.Initialize();
             bool created = Context.Database.EnsureCreated();
             Console.WriteLine(created ? "Database created successfully" : "Database already exists");
-            Application.Run(new ReceiptVoucherForm(Context));
+            Application.Run(new MainForm());
         }
     }
 }

@@ -10,12 +10,6 @@ namespace WarehouseManagmentSystem.WinForms
     public partial class TransferVoucherForm : Form
     {
         #region Fields
-        private readonly WarehouseDbContext _context;
-        private readonly TransferVoucherRepository _transferVoucherRepository;
-        private readonly TransferVoucherDetailRepository _transfereVoucherDetailsRepository;
-        private readonly InventoryItemRepository _inventoryItemRepository;
-        private readonly WarehouseRepository _warehouseRepository;
-        private readonly CustomizedQueriesRepositroy _customizedQueriesRepositroy;
         List<AvailableItemsAtWarehouseDTO> AvailableItemsAtWarehouseList;
         private List<AvailableItemsAtWarehouseDTO> SelectedItemsList;
         private bool isFormLoading = false;
@@ -25,14 +19,8 @@ namespace WarehouseManagmentSystem.WinForms
         #endregion
 
         #region Constructors
-        public TransferVoucherForm(WarehouseDbContext dbContext)
+        public TransferVoucherForm()
         {
-            _context = dbContext;
-            _transferVoucherRepository = new TransferVoucherRepository(_context);
-            _transfereVoucherDetailsRepository = new TransferVoucherDetailRepository(_context);
-            _inventoryItemRepository = new InventoryItemRepository(_context);
-            _warehouseRepository = new WarehouseRepository(_context);
-            _customizedQueriesRepositroy = new CustomizedQueriesRepositroy(_context);
             AvailableItemsAtWarehouseList = new List<AvailableItemsAtWarehouseDTO>();
             SelectedItemsList = new List<AvailableItemsAtWarehouseDTO>();
             InitializeComponent();
@@ -119,27 +107,27 @@ namespace WarehouseManagmentSystem.WinForms
 
         private async Task UpdateTransferToComboBoxAsync()
         {
-            using (var context = new WarehouseDbContext())
-            {
-                var repo = new WarehouseRepository(context);
-                var allWarehouses = await repo.GetAllAsync();
+            using var context = new WarehouseDbContext();
+            var repo = new WarehouseRepository(context);
+            var allWarehouses = await repo.GetAllAsync();
 
-                // Filter out the selected "from" warehouse
-                var filteredWarehouses = allWarehouses
-                    .Where(w => w.Id != fromWarehouseId)
-                    .ToList();
+            // Filter out the selected "from" warehouse
+            var filteredWarehouses = allWarehouses
+                .Where(w => w.Id != fromWarehouseId)
+                .ToList();
 
-                TransferToWarehouseComboBox.DisplayMember = "Name";
-                TransferToWarehouseComboBox.ValueMember = "Id";
-                TransferToWarehouseComboBox.DataSource = filteredWarehouses;
-                TransferToWarehouseComboBox.SelectedIndex = -1;
-            }
+            TransferToWarehouseComboBox.DisplayMember = "Name";
+            TransferToWarehouseComboBox.ValueMember = "Id";
+            TransferToWarehouseComboBox.DataSource = filteredWarehouses;
+            TransferToWarehouseComboBox.SelectedIndex = -1;
         }
         #endregion
 
         #region Transfer From Warehouse GridView
         private async Task AddWarehouseInventoryItemsToTransferFromGridView()
         {
+            using var context = new WarehouseDbContext();
+            var _customizedQueriesRepositroy = new CustomizedQueriesRepositroy(context);
             AvailableItemsAtWarehouseList.Clear();
             AvailableItemsAtWarehouseList = await _customizedQueriesRepositroy.GetAvailableItemsAtWarehouseWithSupplierTransferAsync(fromWarehouseId);
             TransferFromWarehouseGridView.DataSource = AvailableItemsAtWarehouseList;
@@ -417,10 +405,12 @@ namespace WarehouseManagmentSystem.WinForms
         #region Database Operations Methods
         private async Task UpdateQuantitiesAsync()
         {
+            using var context = new WarehouseDbContext();
+            var _inventoryItemRepository = new InventoryItemRepository(context);
             foreach (var selectedItem in SelectedItemsList)
             {
                 // SUBTRACT from source warehouse
-                var sourceItem = await _context.InventoryItems
+                var sourceItem = await context.InventoryItems
                     .FirstOrDefaultAsync(i =>
                         i.WarehouseId == selectedItem.WarehouseId &&
                         i.ItemCode == selectedItem.ItemCode &&
@@ -434,7 +424,7 @@ namespace WarehouseManagmentSystem.WinForms
                 }
 
                 // ADD to destination warehouse
-                var destinationItem = await _context.InventoryItems
+                var destinationItem = await context.InventoryItems
                     .FirstOrDefaultAsync(i =>
                         i.WarehouseId == toWarehouseId &&
                         i.ItemCode == selectedItem.ItemCode &&
@@ -465,6 +455,9 @@ namespace WarehouseManagmentSystem.WinForms
 
         private async Task AddToTransferVoucherAndDetailsTable()
         {
+            using var context = new WarehouseDbContext();
+            var _transferVoucherRepository = new TransferVoucherRepository(context);
+            var _transferVoucherDetailsRepository = new TransferVoucherDetailRepository(context);
             // 1. Create a new TransferVoucher record
             var transferVoucher = new TransferVoucher
             {
@@ -474,7 +467,7 @@ namespace WarehouseManagmentSystem.WinForms
             };
 
             await _transferVoucherRepository.AddAsync(transferVoucher);
-            await _context.SaveChangesAsync(); // Make sure the ID is generated
+            await context.SaveChangesAsync(); // Make sure the ID is generated
 
             // 2. Add corresponding TransferVoucherDetail records
             foreach (var item in SelectedItemsList)
@@ -489,10 +482,10 @@ namespace WarehouseManagmentSystem.WinForms
                     SupplierId = item.SupplierId,
                 };
 
-                await _transfereVoucherDetailsRepository.AddAsync(detail);
+                await _transferVoucherDetailsRepository.AddAsync(detail);
             }
 
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
         }
 
         #endregion
@@ -535,7 +528,8 @@ namespace WarehouseManagmentSystem.WinForms
         {
             if (!IsValidTransfer())
                 return;
-            using var transaction = await _context.Database.BeginTransactionAsync();
+            using var context = new WarehouseDbContext();
+             var transaction = await context.Database.BeginTransactionAsync();
             try
             {
                 await UpdateQuantitiesAsync();

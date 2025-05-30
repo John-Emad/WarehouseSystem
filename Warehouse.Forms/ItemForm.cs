@@ -7,17 +7,11 @@ namespace WarehouseManagmentSystem.WinForms
 {
     public partial class ItemForm : Form
     {
-        #region Fields
-        private readonly WarehouseDbContext _context;
-        private readonly ItemRepository _itemRepository;
-        public List<MeasurementUnit> SelectedUnits { get; private set; }
-        #endregion
+        private List<MeasurementUnit> SelectedUnits;
 
         #region Constructors
-        public ItemForm(WarehouseDbContext context)
+        public ItemForm()
         {
-            _context = context;
-            _itemRepository = new ItemRepository(context);
             SelectedUnits = new List<MeasurementUnit>();
             InitializeComponent();
             LoadItemsToGridView();
@@ -28,14 +22,18 @@ namespace WarehouseManagmentSystem.WinForms
         #region Methods
         private async void LoadItemsToGridView()
         {
-            var items = await _itemRepository.GetAllAsync();
-            var itemsDTO = items.Select(i => new
+            using (var context = new WarehouseDbContext())
             {
-                i.Code,
-                i.Name,
-                MeasurementUnits = string.Join(", ", i.MeasurementUnits),
-            }).ToList();
-            ItemsDataGridView.DataSource = itemsDTO;
+                var itemRepository = new ItemRepository(context);
+                var items = await itemRepository.GetAllAsync();
+                var itemsDTO = items.Select(i => new
+                {
+                    i.Code,
+                    i.Name,
+                    MeasurementUnits = string.Join(", ", i.MeasurementUnits),
+                }).ToList();
+                ItemsDataGridView.DataSource = itemsDTO; 
+            }
         }
         private void LoadMeasuringUnitsToCheckBox()
         {
@@ -70,7 +68,11 @@ namespace WarehouseManagmentSystem.WinForms
                     MeasurementUnits = new List<MeasurementUnit>(SelectedUnits)
                 };
 
-                await _itemRepository.AddAsync(Item);
+                using (var context = new WarehouseDbContext())
+                {
+                    var itemRepository = new ItemRepository(context);
+                    await itemRepository.AddAsync(Item); 
+                }
                 LoadItemsToGridView();
                 ResetEnteredData();
             }

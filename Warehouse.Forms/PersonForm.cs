@@ -8,16 +8,12 @@ namespace WarehouseManagmentSystem.WinForms
     public partial class PersonForm : Form
     {
         #region Fields
-        private readonly WarehouseDbContext _context;
-        private readonly PersonRepository _personRepository;
         public UserType UserType { get; set; }
         #endregion
 
         #region Constructors
-        public PersonForm(WarehouseDbContext context)
+        public PersonForm()
         {
-            _context = context;
-            _personRepository = new PersonRepository(_context);
             InitializeComponent();
             LoadPeopleToGridView();
             LoadUserTypeToComboBox();
@@ -33,19 +29,23 @@ namespace WarehouseManagmentSystem.WinForms
 
         private async void LoadPeopleToGridView()
         {
-            var people = await _personRepository.GetAllAsync();
-            var peopleDTO = people.Select(p => new
+            using (var context = new WarehouseDbContext())
             {
-                p.Name,
-                p.Landline,
-                p.Fax,
-                p.Mobile,
-                p.Email,
-                p.Website,
-                PersonType = p is Customer ? "Customer" :
-                             p is Supplier ? "Supplier" : "Unknown"
-            }).ToList();
-            personDataGridView.DataSource = peopleDTO;
+                var peopleRepository = new PersonRepository(context);
+                var people = await peopleRepository.GetAllAsync();
+                var peopleDTO = people.Select(p => new
+                {
+                    p.Name,
+                    p.Landline,
+                    p.Fax,
+                    p.Mobile,
+                    p.Email,
+                    p.Website,
+                    PersonType = p is Customer ? "Customer" :
+                                 p is Supplier ? "Supplier" : "Unknown"
+                }).ToList();
+                personDataGridView.DataSource = peopleDTO; 
+            }
         }
 
         private async void AddUserButton_ClickAsync(object sender, EventArgs e)
@@ -70,33 +70,38 @@ namespace WarehouseManagmentSystem.WinForms
             try
             {
 
-                switch (UserType)
+                using (var context = new WarehouseDbContext())
                 {
-                    case UserType.Supplier:
-                        Supplier supplier = new Supplier
-                        {
-                            Name = UserNameTextBox.Text,
-                            Landline = UserLandlineTextBox.Text,
-                            Fax = UserFaxTextBox.Text,
-                            Mobile = UserMobileTextBox.Text,
-                            Email = UserEmailTextBox.Text,
-                            Website = UserWebsiteTextBox.Text,
-                        };
-                        await _personRepository.AddAsync(supplier);
-                        break;
+                    var personRepository = new PersonRepository(context);
+                    switch (UserType)
+                    {
 
-                    case UserType.Customer:
-                        Customer customer = new Customer
-                        {
-                            Name = UserNameTextBox.Text,
-                            Landline = UserLandlineTextBox.Text,
-                            Fax = UserFaxTextBox.Text,
-                            Mobile = UserMobileTextBox.Text,
-                            Email = UserEmailTextBox.Text,
-                            Website = UserWebsiteTextBox.Text,
-                        };
-                        await _personRepository.AddAsync(customer);
-                        break;
+                        case UserType.Supplier:
+                            Supplier supplier = new Supplier
+                            {
+                                Name = UserNameTextBox.Text,
+                                Landline = UserLandlineTextBox.Text,
+                                Fax = UserFaxTextBox.Text,
+                                Mobile = UserMobileTextBox.Text,
+                                Email = UserEmailTextBox.Text,
+                                Website = UserWebsiteTextBox.Text,
+                            };
+                            await personRepository.AddAsync(supplier);
+                            break;
+
+                        case UserType.Customer:
+                            Customer customer = new Customer
+                            {
+                                Name = UserNameTextBox.Text,
+                                Landline = UserLandlineTextBox.Text,
+                                Fax = UserFaxTextBox.Text,
+                                Mobile = UserMobileTextBox.Text,
+                                Email = UserEmailTextBox.Text,
+                                Website = UserWebsiteTextBox.Text,
+                            };
+                            await personRepository.AddAsync(customer);
+                            break;
+                    } 
                 }
                 ResetFormEnteredData();
                 LoadPeopleToGridView();

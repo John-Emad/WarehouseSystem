@@ -9,26 +9,12 @@ namespace WarehouseManagmentSystem.WinForms
     public partial class ReceiptVoucherForm : Form
     {
         #region Fields
-        private readonly WarehouseDbContext _context;
-        private readonly ReceiptVoucherRepository _receiptVoucherRepository;
-        private readonly ReceiptVoucherDetailsRepository _receiptVoucherDetailsRepository;
-        private readonly InventoryItemRepository _inventoryItemRepository;
-        private readonly WarehouseRepository _warehouseRepository;
-        private readonly ItemRepository _itemRepository;
-        private readonly PersonRepository _personRepository;
         private List<InventoryItemViewDTO> InventoryItemViewDTOList;
         #endregion
 
         #region Constructors
-        public ReceiptVoucherForm(WarehouseDbContext dbContext)
+        public ReceiptVoucherForm()
         {
-            _context = dbContext;
-            _receiptVoucherRepository = new ReceiptVoucherRepository(_context);
-            _receiptVoucherDetailsRepository = new ReceiptVoucherDetailsRepository(_context);
-            _inventoryItemRepository = new InventoryItemRepository(_context);
-            _warehouseRepository = new WarehouseRepository(_context);
-            _itemRepository = new ItemRepository(_context);
-            _personRepository = new PersonRepository(_context);
             InventoryItemViewDTOList = new List<InventoryItemViewDTO>();
             InitializeComponent();
             LoadData();
@@ -46,6 +32,8 @@ namespace WarehouseManagmentSystem.WinForms
         }
         private async Task LoadWareHousesToComboBox()
         {
+            using var context = new WarehouseDbContext();
+            var _warehouseRepository = new WarehouseRepository(context);
             List<Warehouse> warehouses = new List<Warehouse>();
             warehouses = await _warehouseRepository.GetAllAsync();
             ReceiptVoucherWarehouseComboBox.DisplayMember = "Name";
@@ -54,6 +42,8 @@ namespace WarehouseManagmentSystem.WinForms
         }
         private async Task LoadSuppliersToComboBox()
         {
+            using var context = new WarehouseDbContext();
+            var _personRepository = new PersonRepository(context);
             List<Supplier> suppliers = new List<Supplier>();
             suppliers = await _personRepository.GetSuppliersAsync();
             ReceiptVoucherSupplierComboBox.DisplayMember = "Name";
@@ -62,6 +52,8 @@ namespace WarehouseManagmentSystem.WinForms
         }
         private async Task LoadItemsToComboBox()
         {
+            using var context = new WarehouseDbContext();
+            var _itemRepository = new ItemRepository(context);
             List<Item> items = new List<Item>();
             items = await _itemRepository.GetAllAsync();
             ReceiptVoucherItemsComboBox.DisplayMember = "Name";
@@ -101,6 +93,10 @@ namespace WarehouseManagmentSystem.WinForms
         {
             if (!IsValidReceipt())
                 return;
+
+            using var context = new WarehouseDbContext();
+            var _inventoryItemRepository = new InventoryItemRepository(context);
+
             var warehouseId = (int)ReceiptVoucherWarehouseComboBox.SelectedValue;
             var existingItems = await _inventoryItemRepository.GetAllAsync();
 
@@ -138,6 +134,9 @@ namespace WarehouseManagmentSystem.WinForms
         }
         private async Task AddToReceiptVoucherAndDetailsTables()
         {
+            using var context = new WarehouseDbContext();
+            var _receiptVoucherRepository = new ReceiptVoucherRepository(context);
+            var _receiptVoucherDetailsRepository = new ReceiptVoucherDetailsRepository(context);
             var receiptVoucher = new ReceiptVoucher
             {
                 Date = DateOnly.FromDateTime(ReceiptVoucherReceiptDate.Value),

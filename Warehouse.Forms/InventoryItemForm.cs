@@ -12,6 +12,8 @@ namespace WarehouseManagmentSystem.WinForms
         private readonly InventoryItemRepository _inventoryItemRepository;
         private readonly WarehouseRepository _warehouseRepository;
         private readonly ItemRepository _itemRepository;
+        List<Warehouse> warehousesList = new List<Warehouse>();
+        List<Item> itemsList = new List<Item>();
         #endregion
 
         #region Constructors
@@ -29,27 +31,39 @@ namespace WarehouseManagmentSystem.WinForms
         #endregion
 
         #region Methods
+        #region Adding items to views
         private async void LoadInventoryItemsToGridViewAsync()
         {
-            var inventoryItems = await _inventoryItemRepository.GetAllAsync();
-            InventoryItemDataGridView.DataSource = inventoryItems;
+            using (var context = new WarehouseDbContext())
+            {
+                var inventoryRepo = new InventoryItemRepository(context);
+                InventoryItemDataGridView.DataSource = await inventoryRepo.GetAllAsync();
+            }
         }
         private async void LoadWareHousesToComboBox()
         {
-            List<Warehouse> warehouses = new List<Warehouse>();
-            warehouses = await _warehouseRepository.GetAllAsyncWithManagerName();
-            InventoryItemWarehouseComboBox.DisplayMember = "Name";
-            InventoryItemWarehouseComboBox.ValueMember = "Id";
-            InventoryItemWarehouseComboBox.DataSource = warehouses;
+            using (var context = new WarehouseDbContext())
+            {
+                var warehouseRepo = new WarehouseRepository(context);
+                warehousesList = await warehouseRepo.GetAllAsyncWithManagerName();
+                InventoryItemWarehouseComboBox.DisplayMember = "Name";
+                InventoryItemWarehouseComboBox.ValueMember = "Id";
+                InventoryItemWarehouseComboBox.DataSource = warehousesList;
+            }
         }
         private async void LoadItemToComboBox()
         {
-            List<Item> items = new List<Item>();
-            items = await _itemRepository.GetAllAsync();
-            InventoryItemNameComboBox.DisplayMember = "Name";
-            InventoryItemNameComboBox.ValueMember = "Code";
-            InventoryItemNameComboBox.DataSource = items;
-        }
+
+            using (var context = new WarehouseDbContext())
+            {
+                var items = new ItemRepository(context);
+                itemsList = await items.GetAllAsync();
+                InventoryItemNameComboBox.DisplayMember = "Name";
+                InventoryItemNameComboBox.ValueMember = "Code";
+                InventoryItemNameComboBox.DataSource = itemsList;
+            }
+        } 
+        #endregion
         private void InventoryItemAddButton_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(InventoryItemQuantityTextBox.Text))
