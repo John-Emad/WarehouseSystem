@@ -11,26 +11,14 @@ namespace WarehouseManagmentSystem.WinForms
     public partial class IssueVoucherForm : Form
     {
         #region Fields
-        private readonly WarehouseDbContext _context;
-        private readonly IssueVoucherRepository _issueVoucherRepository;
-        private readonly IssueVoucherDetailRepository _issueVoucherDetailsRepository;
-        private readonly InventoryItemRepository _inventoryItemRepository;
-        private readonly WarehouseRepository _warehouseRepository;
-        private readonly CustomizedQueriesRepositroy _customizedQueriesRepositroy;
         List<AvailableItemsAtWarehouseDTO> AvailableItemsAtWarehouseList;
         private List<AvailableItemsAtWarehouseDTO> SelectedItemsList;
         private int warehouseId;
         #endregion
 
         #region Constructors
-        public IssueVoucherForm(WarehouseDbContext dbContext)
+        public IssueVoucherForm()
         {
-            _context = dbContext;
-            _issueVoucherRepository = new IssueVoucherRepository(_context);
-            _issueVoucherDetailsRepository = new IssueVoucherDetailRepository(_context);
-            _inventoryItemRepository = new InventoryItemRepository(_context);
-            _warehouseRepository = new WarehouseRepository(_context);
-            _customizedQueriesRepositroy = new CustomizedQueriesRepositroy(_context);
             AvailableItemsAtWarehouseList = new List<AvailableItemsAtWarehouseDTO>();
             SelectedItemsList = new List<AvailableItemsAtWarehouseDTO>();
             InitializeComponent();
@@ -61,6 +49,8 @@ namespace WarehouseManagmentSystem.WinForms
         }
         private async Task LoadWareHousesToComboBox()
         {
+            using var context = new WarehouseDbContext();
+            var _warehouseRepository = new WarehouseRepository(context);
             List<Warehouse> warehouses = new List<Warehouse>();
             warehouses = await _warehouseRepository.GetAllAsync();
             IssueVoucherWarehouseComboBox.DisplayMember = "Name";
@@ -83,6 +73,8 @@ namespace WarehouseManagmentSystem.WinForms
         #region Issue Voucher Items Methods and Event handlers
         private async Task LoadInventoryItemsToIssueVoucherItemsGridView(int WareHouseId)
         {
+            using var context = new WarehouseDbContext();
+            var _customizedQueriesRepositroy = new CustomizedQueriesRepositroy(context);
             AvailableItemsAtWarehouseList = await _customizedQueriesRepositroy.GetAvailableItemsAtWarehouseWithSupplierTransferAsync(WareHouseId);
             IssueVoucherItemsGridView.DataSource = AvailableItemsAtWarehouseList;
 
@@ -162,7 +154,8 @@ namespace WarehouseManagmentSystem.WinForms
         {
             if (!IsValidIssue())
                 return;
-            using var transaction = await _context.Database.BeginTransactionAsync();
+            using var context = new WarehouseDbContext();
+            var transaction = await context.Database.BeginTransactionAsync();
             try
             {
                 await AddToIssueVoucherAndDetailsTable();
@@ -404,7 +397,9 @@ namespace WarehouseManagmentSystem.WinForms
             foreach (var selectedItem in SelectedItemsList)
             {
                 // Find the existing tracked entity
-                var existingItem = await _context.InventoryItems
+                using var context = new WarehouseDbContext();
+                var _inventoryItemRepository = new InventoryItemRepository(context);
+                var existingItem = await context.InventoryItems
                     .FirstOrDefaultAsync(i =>
                         i.WarehouseId == selectedItem.WarehouseId &&
                         i.ItemCode == selectedItem.ItemCode &&
@@ -421,6 +416,9 @@ namespace WarehouseManagmentSystem.WinForms
         }
         private async Task AddToIssueVoucherAndDetailsTable()
         {
+            using var context = new WarehouseDbContext();
+            var _issueVoucherRepository = new IssueVoucherRepository(context);
+            var _issueVoucherDetailsRepository = new IssueVoucherDetailRepository(context);
             var issueVoucher = new IssueVoucher
             {
                 Date = DateOnly.FromDateTime(IssueVoucherIssueDate.Value),

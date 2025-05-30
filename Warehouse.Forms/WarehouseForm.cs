@@ -8,17 +8,11 @@ namespace WarehouseManagmentSystem.WinForms.Forms
     public partial class WarehouseForm : Form
     {
         #region Fields
-        private readonly WarehouseDbContext _context;
-        private readonly WarehouseRepository _warehouseRepository;
-        private readonly PersonRepository _personRepository;
         #endregion
 
         #region Constructors
-        public WarehouseForm(WarehouseDbContext context)
+        public WarehouseForm()
         {
-            _context = context;
-            _warehouseRepository = new WarehouseRepository(_context);
-            _personRepository = new PersonRepository(_context);
             InitializeComponent();
             LoadDataAsync();
             WarehouseManagerComboBox.SelectedIndex = -1;
@@ -33,19 +27,25 @@ namespace WarehouseManagmentSystem.WinForms.Forms
         }
         private async Task LoadWarehousesToGridViewAsync()
         {
-            var warehouses = await _warehouseRepository.GetAllAsyncWithManagerName();
-            var warehousesDTO = warehouses.Select(w => new
+            using (var context = new WarehouseDbContext())
             {
-                w.Name,
-                w.Address,
-                ResponsiblePerson = w.ResponsiblePerson?.Name ?? "N/A",
-            }).ToList();
-            warehouseDataGridView.DataSource = warehousesDTO;
+                var warehouseRepository = new WarehouseRepository(context);
+                var warehouses = await warehouseRepository.GetAllAsyncWithManagerName();
+                var warehousesDTO = warehouses.Select(w => new
+                {
+                    w.Name,
+                    w.Address,
+                    ResponsiblePerson = w.ResponsiblePerson?.Name ?? "N/A",
+                }).ToList();
+                warehouseDataGridView.DataSource = warehousesDTO; 
+            }
         }
         private async Task LoadPersonsToComboBox()
         {
+            var context = new WarehouseDbContext();
+            var personRepository = new PersonRepository(context);
             List<Person> people = new List<Person>();
-            people = await _personRepository.GetAllAsync();
+            people = await personRepository.GetAllAsync();
             WarehouseManagerComboBox.DisplayMember = "Name";
             WarehouseManagerComboBox.ValueMember = "Id";
             WarehouseManagerComboBox.DataSource = people;
@@ -73,8 +73,9 @@ namespace WarehouseManagmentSystem.WinForms.Forms
                     Address = WarehouseAddressTextBox.Text,
                     ResponsiblePersonId = (int?)WarehouseManagerComboBox.SelectedValue,
                 };
-
-                await _warehouseRepository.AddAsync(warehouse);
+                using var context = new WarehouseDbContext();
+                var warehouseRepository = new WarehouseRepository(context);
+                await warehouseRepository.AddAsync(warehouse);
                 await LoadWarehousesToGridViewAsync();
                 ResetEnteredData();
             }
