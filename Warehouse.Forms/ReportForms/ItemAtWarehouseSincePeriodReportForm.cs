@@ -14,20 +14,20 @@ using WarehouseManagementSystem.Domain.Models;
 
 namespace WarehouseManagmentSystem.WinForms.ReportForms
 {
-    public partial class ItemTransferReportForm : Form
+    public partial class ItemAtWarehouseSincePeriodReportForm : Form
     {
         #region Fields
+        private int DaysPeriod;
         private DateOnly StartReportDate;
-        private DateOnly EndReportDate;
         private List<int> SelectedWarehousesIDs = new List<int>();
         #endregion
-        public ItemTransferReportForm()
+        public ItemAtWarehouseSincePeriodReportForm()
         {
             InitializeComponent();
             HideUI();
         }
 
-        private async void ItemTransferReportForm_Load(object sender, EventArgs e)
+        private async void ItemAtWarehouseSincePeriodReportForm_Load(object sender, EventArgs e)
         {
             await InitializeDataAsync();
         }
@@ -56,36 +56,27 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
         #region UI
         private void HideUI()
         {
-            ReportStartDateDatePicker.Visible = false;
-            ReportEndDateDatePicker.Visible = false;
             FromDateLabel.Visible = false;
-            ToDateLabel.Visible = false;
-            CurrentItemLabel.Visible = false;
+            ReportStartDateDatePicker.Visible = false;
         }
         #endregion
 
         #region Event Handlers (Checkbox, ComboBox, CheckboxList)
-        private void WithinRangeDateCheckBox_CheckStateChanged(object sender, EventArgs e)
+        private void ChooseDateCheckBox_ChechStateChanged(object sender, EventArgs e)
         {
-            if (WithinRangeDateCheckBox.Checked)
+            if (ChooseDateInsteadCheckBox.Checked)
             {
-                ReportEndDateDatePicker.Visible = true;
-                ReportEndDateDatePicker.Text = "";
-                ReportStartDateDatePicker.Visible = true;
-                ReportEndDateDatePicker.Text = "";
-
+                PeriodDaysLabel.Visible = false;
+                PeriodDaysTextBox.Visible = false;
                 FromDateLabel.Visible = true;
-                FromDateLabel.Text = "Start from:";
-
-                ToDateLabel.Visible = true;
-                ToDateLabel.Text = "To:";
+                ReportStartDateDatePicker.Visible = true;
             }
             else
             {
-                ReportStartDateDatePicker.Visible = false;
-                ReportEndDateDatePicker.Visible = false;
+                PeriodDaysLabel.Visible = true;
+                PeriodDaysTextBox.Visible = true;
                 FromDateLabel.Visible = false;
-                ToDateLabel.Visible = false;
+                ReportStartDateDatePicker.Visible = false;
             }
         }
         private void ReportForWarehousesCheckBoxList_ItemCheck(object sender, ItemCheckEventArgs e)
@@ -110,16 +101,9 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
         {
             using var context = new WarehouseDbContext();
             var _customizedQueriesRepository = new CustomizedQueriesRepositroy(context);
-            if (WithinRangeDateCheckBox.Checked)
-            {
-                var items = await _customizedQueriesRepository.GetAllItemDetailsWithinWarehousesWithinDateRange(SelectedWarehousesIDs, StartReportDate, EndReportDate);
-                ReportViewGridView.DataSource = ConfigureReportGridView(items);
-            }
-            else
-            {
-                var items = await _customizedQueriesRepository.GetAllItemDetailsWithinWarehouses(SelectedWarehousesIDs);
-                ReportViewGridView.DataSource = ConfigureReportGridView(items);
-            }
+
+            var items = await _customizedQueriesRepository.GetAllAvailableItemAtWarehouseSincePeriod(SelectedWarehousesIDs, StartReportDate);
+            ReportViewGridView.DataSource = ConfigureReportGridView(items);
 
             HideUnnecessaryWarehouseDataColumns();
             MessageBox.Show("Searching Done");
@@ -134,26 +118,11 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
             }
-
-            if (string.IsNullOrWhiteSpace(ReportEndDateDatePicker.Text))
-            {
-                MessageBox.Show("Must Specify the end date", "Validation Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return false;
-            }
-
             StartReportDate = DateOnly.FromDateTime(ReportStartDateDatePicker.Value.Date);
-            EndReportDate = DateOnly.FromDateTime(ReportEndDateDatePicker.Value.Date);
 
-            if (StartReportDate >= EndReportDate)
-            {
-                MessageBox.Show("End Date must be after Start Date", "Validation Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return false;
-            }
             return true;
         }
-        private bool IsValidItemsTransferReport()
+        private bool IsValidItemsAtWarehouseSincePeriodReport()
         {
 
             if (ReportForWarehousesCheckBoxList.CheckedItems.Count == 0)
@@ -163,14 +132,40 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
                 return false;
             }
 
-            if (WithinRangeDateCheckBox.Checked)
+            if (ChooseDateInsteadCheckBox.Checked)
             {
                 if (!IsValideDates())
                 {
                     return false;
                 }
             }
+            else
+            {
+                if (!IsValidPeriodDays())
+                {
+                    return false;
+                }
+            }
             return true;
+        }
+
+        private bool IsValidPeriodDays()
+        {
+            if (string.IsNullOrEmpty(PeriodDaysTextBox.Text))
+            {
+                MessageBox.Show("Must type a period days number", "Validation Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
+
+            if(!int.TryParse(PeriodDaysTextBox.Text, out DaysPeriod) || DaysPeriod < 0)
+            {
+                MessageBox.Show("Must be 0 or more days in a whole number", "Validation Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
+            StartReportDate = DateOnly.FromDateTime(DateTime.Now).AddDays(-DaysPeriod);
+           return true;
         }
         #endregion
 
@@ -188,18 +183,14 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
             if (ReportViewGridView.Columns.Contains("ItemName"))
                 ReportViewGridView.Columns["ItemName"].Visible = false;
 
-            if (ReportViewGridView.Columns.Contains("ToWarehouseId"))
-                ReportViewGridView.Columns["ToWarehouseId"].Visible = false;
+            if (ReportViewGridView.Columns.Contains("WarehouseName"))
+                ReportViewGridView.Columns["WarehouseName"].Visible = false;
 
-            if (ReportViewGridView.Columns.Contains("FromWarehouseId"))
-                ReportViewGridView.Columns["FromWarehouseId"].Visible = false;
+            if (ReportViewGridView.Columns.Contains("WarehouseId"))
+                ReportViewGridView.Columns["WarehouseId"].Visible = false;
 
-
-            if (ReportViewGridView.Columns.Contains("Warehouse"))
-                ReportViewGridView.Columns["Warehouse"].Visible = false;
-
-            if (ReportViewGridView.Columns.Contains("CurrentQuantity"))
-                ReportViewGridView.Columns["CurrentQuantity"].Visible = false;
+            if (ReportViewGridView.Columns.Contains("AvailableQuantity"))
+                ReportViewGridView.Columns["AvailableQuantity"].Visible = false;
 
 
             if (ReportViewGridView.Columns.Contains("IsSummaryRow"))
@@ -210,7 +201,7 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
 
         private void ActionButton_Click(object sender, EventArgs e)
         {
-            if (IsValidItemsTransferReport())
+            if (IsValidItemsAtWarehouseSincePeriodReport())
             {
                 ReportChosenItemAtChosenWarehouses();
             }
@@ -253,7 +244,7 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
             var grid = (DataGridView)sender;
             var row = grid.Rows[e.RowIndex];
 
-            if (row.DataBoundItem is ItemMovementReportDTO item && item.IsSummaryRow)
+            if (row.DataBoundItem is ItemAtWarehouseSincePeriodDTO item && item.IsSummaryRow)
             {
                 // Prevent default painting for all cells in summary row
                 e.Handled = true;
@@ -280,7 +271,7 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
                     {
                         e.Graphics.FillRectangle(backBrush, fullBounds);
 
-                        string summaryText = $"📦 {item.ItemName}   |   🏭 {item.Warehouse}";
+                        string summaryText = $"📦 {item.ItemName}   |   🏭 {item.WarehouseName}   |   Available: {item.AvailableQuantity}";
 
                         TextRenderer.DrawText(e.Graphics,
                             summaryText,
@@ -299,22 +290,25 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
 
 
         #region Items transfer GridView Data Manipulation
-        private List<ItemMovementReportDTO> ConfigureReportGridView(List<ItemMovementReportDTO> allData)
+        private List<ItemAtWarehouseSincePeriodDTO> ConfigureReportGridView(List<ItemAtWarehouseSincePeriodDTO> allData)
         {
             var groupedData = allData
-                .GroupBy(x => new { x.ItemCode, x.Warehouse})
+                .GroupBy(x => new { x.ItemCode, x.WarehouseId, x.AvailableQuantity })
                 .OrderBy(g => g.Key.ItemCode)
+                .OrderBy(f => f.Key.WarehouseId)
                 .ToList();
 
-            var displayList = new List<ItemMovementReportDTO>();
+            var displayList = new List<ItemAtWarehouseSincePeriodDTO>();
 
             foreach (var group in groupedData)
             {
-                displayList.Add(new ItemMovementReportDTO
+                displayList.Add(new ItemAtWarehouseSincePeriodDTO
                 {
-                    ItemCode = group.First().ItemCode,
+                    ItemCode = group.Key.ItemCode,
                     ItemName = group.First().ItemName,
-                    Warehouse = group.Key.Warehouse,
+                    WarehouseId = group.Key.WarehouseId,
+                    WarehouseName = group.First().WarehouseName,
+                    AvailableQuantity = group.Key.AvailableQuantity,
                     IsSummaryRow = true
                 });
 
@@ -325,6 +319,6 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
             return displayList;
         }
         #endregion
+
     }
 }
-

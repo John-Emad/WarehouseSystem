@@ -43,6 +43,7 @@ namespace WarehouseManagmentSystem.WinForms
             reportsMenu.DropDownItems.Add("Warehouse Report", null, (s, e) => OpenForm(new WarehousReportForm()));
             reportsMenu.DropDownItems.Add("Item Report", null, (s, e) => OpenForm(new ItemReportForm()));
             reportsMenu.DropDownItems.Add("Item Transfer Report", null, (s, e) => OpenForm(new ItemTransferReportForm()));
+            reportsMenu.DropDownItems.Add("Item Since Period Report", null, (s, e) => OpenForm(new ItemAtWarehouseSincePeriodReportForm()));
 
             // Add all main menu items
             mainMenu.Items.AddRange(new ToolStripItem[] {
