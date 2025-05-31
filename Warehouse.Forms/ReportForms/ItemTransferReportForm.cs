@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿
 using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using WarehouseManagementSystem.Data.Context;
 using WarehouseManagementSystem.Data.Repositories;
 using WarehouseManagementSystem.Domain.DTOs;
@@ -261,12 +254,10 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
                 if (grid.Columns[e.ColumnIndex].Name == "Quantity")
                 {
                     // Calculate the full row width
-                    int totalWidth = 0;
-                    foreach (DataGridViewColumn col in grid.Columns)
-                    {
-                        if (col.Visible)
-                            totalWidth += grid.GetCellDisplayRectangle(col.Index, e.RowIndex, true).Width;
-                    }
+                    int totalWidth = grid.Columns
+                    .Cast<DataGridViewColumn>()
+                    .Where(c => c.Visible)
+                    .Sum(c => grid.GetColumnDisplayRectangle(c.Index, false).Width);
 
                     Rectangle fullBounds = new Rectangle(
                         grid.GetCellDisplayRectangle(0, e.RowIndex, true).X,
@@ -275,21 +266,37 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
                         e.CellBounds.Height
                     );
 
-                    using (Brush backBrush = new SolidBrush(Color.LightGray))
-                    using (Font boldFont = new Font("Segoe UI", 10, FontStyle.Bold))
+                    // Determine styling based on summary level
+                    Color backColor = item.IsSummaryRow ? Color.FromArgb(220, 230, 241) : Color.FromArgb(234, 242, 252);
+                    Color borderColor = item.IsSummaryRow ? Color.SteelBlue : Color.LightGray;
+                    Font font = new Font("Segoe UI", item.IsSummaryRow ? 10 : 9,
+                                       item.IsSummaryRow ? FontStyle.Bold : FontStyle.Regular);
+
+                    using (Brush backBrush = new SolidBrush(backColor))
+                    using (Brush textBrush = new SolidBrush(Color.FromArgb(50, 50, 50)))
+                    using (Pen borderPen = new Pen(borderColor, 1.5f))
                     {
                         e.Graphics.FillRectangle(backBrush, fullBounds);
 
                         string summaryText = $"📦 {item.ItemName}   |   🏭 {item.Warehouse}";
 
+                        Rectangle textBounds = new Rectangle(
+                            fullBounds.X + 10,
+                            fullBounds.Y,
+                            fullBounds.Width - 20,
+                            fullBounds.Height
+                        );
+
                         TextRenderer.DrawText(e.Graphics,
                             summaryText,
-                            boldFont,
-                            fullBounds,
+                            font,
+                            textBounds,
                             Color.Black,
-                            TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis);
+                            TextFormatFlags.Left | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis);
 
-                        e.Graphics.DrawLine(Pens.Gray, fullBounds.Left, fullBounds.Bottom - 1, fullBounds.Right, fullBounds.Bottom - 1);
+                        // Draw borders
+                        e.Graphics.DrawLine(borderPen, fullBounds.Left, fullBounds.Top, fullBounds.Right, fullBounds.Top);
+                        e.Graphics.DrawLine(borderPen, fullBounds.Left, fullBounds.Bottom - 1, fullBounds.Right, fullBounds.Bottom - 1);
                     }
                 }
             }

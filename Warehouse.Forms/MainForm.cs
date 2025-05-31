@@ -44,6 +44,7 @@ namespace WarehouseManagmentSystem.WinForms
             reportsMenu.DropDownItems.Add("Item Report", null, (s, e) => OpenForm(new ItemReportForm()));
             reportsMenu.DropDownItems.Add("Item Transfer Report", null, (s, e) => OpenForm(new ItemTransferReportForm()));
             reportsMenu.DropDownItems.Add("Item Since Period Report", null, (s, e) => OpenForm(new ItemAtWarehouseSincePeriodReportForm()));
+            reportsMenu.DropDownItems.Add("Item Remaining days for Expiration", null, (s, e) => OpenForm(new ItemAtWarehouseDaysTillExpirationReportForm()));
 
             // Add all main menu items
             mainMenu.Items.AddRange(new ToolStripItem[] {
