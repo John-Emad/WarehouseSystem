@@ -6,20 +6,20 @@ using WarehouseManagementSystem.Domain.Models;
 
 namespace WarehouseManagmentSystem.WinForms.ReportForms
 {
-    public partial class ItemAtWarehouseSincePeriodReportForm : Form
+    public partial class ItemAtWarehouseDaysTillExpirationReportForm : Form
     {
         #region Fields
         private int DaysPeriod;
         private DateOnly StartReportDate;
         private List<int> SelectedWarehousesIDs = new List<int>();
         #endregion
-        public ItemAtWarehouseSincePeriodReportForm()
+        public ItemAtWarehouseDaysTillExpirationReportForm()
         {
             InitializeComponent();
             HideUI();
         }
 
-        private async void ItemAtWarehouseSincePeriodReportForm_Load(object sender, EventArgs e)
+        private async void ItemAtWarehouseDaysTillExpirationReportForm_Load(object sender, EventArgs e)
         {
             await InitializeDataAsync();
         }
@@ -94,7 +94,7 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
             using var context = new WarehouseDbContext();
             var _customizedQueriesRepository = new CustomizedQueriesRepositroy(context);
 
-            var items = await _customizedQueriesRepository.GetAllAvailableItemAtWarehouseSincePeriod(SelectedWarehousesIDs, StartReportDate);
+            var items = await _customizedQueriesRepository.GetAllAvailableItemAtWarehouseExpiration(SelectedWarehousesIDs, StartReportDate);
             ReportViewGridView.DataSource = ConfigureReportGridView(items);
 
             HideUnnecessaryWarehouseDataColumns();
@@ -188,6 +188,9 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
             if (ReportViewGridView.Columns.Contains("IsSummaryRow"))
                 ReportViewGridView.Columns["IsSummaryRow"].Visible = false;
 
+
+            if (ReportViewGridView.Columns.Contains("IsWarehouseSummary"))
+                ReportViewGridView.Columns["IsWarehouseSummary"].Visible = false;
         }
         #endregion
 
@@ -203,7 +206,7 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
         private void ReportViewGridView_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
         {
             if (e.RowIndex >= 0 &&
-                ReportViewGridView.Rows[e.RowIndex].DataBoundItem is ItemMovementReportDTO item &&
+                ReportViewGridView.Rows[e.RowIndex].DataBoundItem is ItemRemainingDaysForExpirationDTO item &&
                 item.IsSummaryRow)
             {
                 // Only show the summary text in the first column (e.g., ItemName or custom one)
@@ -222,7 +225,7 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
         private void ReportViewGridView_RowPrePaint(object sender, DataGridViewRowPrePaintEventArgs e)
         {
             var row = ReportViewGridView.Rows[e.RowIndex];
-            if (row.DataBoundItem is ItemMovementReportDTO item && item.IsSummaryRow)
+            if (row.DataBoundItem is ItemRemainingDaysForExpirationDTO item && item.IsSummaryRow)
             {
                 row.DefaultCellStyle.BackColor = Color.LightGray;
                 row.DefaultCellStyle.Font = new Font("Segoe UI", 10, FontStyle.Bold);
@@ -236,92 +239,126 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
             var grid = (DataGridView)sender;
             var row = grid.Rows[e.RowIndex];
 
-            if (row.DataBoundItem is ItemAtWarehouseSincePeriodDTO item && item.IsSummaryRow)
+            if (row.DataBoundItem is ItemRemainingDaysForExpirationDTO item && item.IsSummaryRow)
             {
-                // Prevent default painting for all cells in summary row
-                e.Handled = true;
+                e.Handled = true; // Take over all painting for summary rows
 
-                if (grid.Columns[e.ColumnIndex].Name == "Quantity")
-                {
-                    // Calculate the full row width
-                    int totalWidth = grid.Columns
+                // Calculate full row width (including hidden columns)
+                int totalWidth = grid.Columns
                     .Cast<DataGridViewColumn>()
                     .Where(c => c.Visible)
                     .Sum(c => grid.GetColumnDisplayRectangle(c.Index, false).Width);
 
-                    Rectangle fullBounds = new Rectangle(
-                            grid.GetCellDisplayRectangle(0, e.RowIndex, true).X,
-                            e.CellBounds.Y,
-                            totalWidth,
-                            e.CellBounds.Height
-                        );
+                Rectangle fullBounds = new Rectangle(
+                    grid.GetCellDisplayRectangle(0, e.RowIndex, true).X,
+                    e.CellBounds.Y,
+                    totalWidth,
+                    e.CellBounds.Height
+                );
 
-                    // Determine styling based on summary level
-                    Color backColor = item.IsSummaryRow? Color.FromArgb(220, 230, 241) : Color.FromArgb(234, 242, 252);
-                    Color borderColor = item.IsSummaryRow ? Color.SteelBlue : Color.LightGray;
-                    Font font = new Font("Segoe UI", item.IsSummaryRow ? 10 : 9,
-                                       item.IsSummaryRow ? FontStyle.Bold : FontStyle.Regular);
+                // Determine styling based on summary level
+                Color backColor = item.IsWarehouseSummary ? Color.FromArgb(220, 230, 241) : Color.FromArgb(234, 242, 252);
+                Color borderColor = item.IsWarehouseSummary ? Color.SteelBlue : Color.LightGray;
+                Font font = new Font("Segoe UI", item.IsWarehouseSummary ? 10 : 9,
+                                   item.IsWarehouseSummary ? FontStyle.Bold : FontStyle.Regular);
 
-                    using (Brush backBrush = new SolidBrush(backColor))
-                    using (Brush textBrush = new SolidBrush(Color.FromArgb(50, 50, 50)))
-                    using (Pen borderPen = new Pen(borderColor, 1.5f))
+                using (Brush backBrush = new SolidBrush(backColor))
+                using (Brush textBrush = new SolidBrush(Color.FromArgb(50, 50, 50)))
+                using (Pen borderPen = new Pen(borderColor, 1.5f))
+                {
+                    // Draw background
+                    e.Graphics.FillRectangle(backBrush, fullBounds);
+
+                    // Build summary text
+                    string summaryText;
+                    if (item.IsWarehouseSummary)
                     {
-                        e.Graphics.FillRectangle(backBrush, fullBounds);
-
-                        string summaryText = $"🏭 {item.WarehouseName} 📦 {item.ItemName} •  {item.AvailableQuantity} in stock";
-
-                        Rectangle textBounds = new Rectangle(
-                            fullBounds.X + 10,
-                            fullBounds.Y,
-                            fullBounds.Width - 20,
-                            fullBounds.Height
-                        );
-
-                        TextRenderer.DrawText(e.Graphics,
-                            summaryText,
-                            font,
-                            textBounds,
-                            Color.Black,
-                            TextFormatFlags.Left | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis);
-
-                        // Draw borders
-                        e.Graphics.DrawLine(borderPen, fullBounds.Left, fullBounds.Top, fullBounds.Right, fullBounds.Top);
-                        e.Graphics.DrawLine(borderPen, fullBounds.Left, fullBounds.Bottom - 1, fullBounds.Right, fullBounds.Bottom - 1);
+                        summaryText = $"🏭 WAREHOUSE: {item.WarehouseName?.ToUpper()}";
                     }
+                    else
+                    {
+                        string stockInfo = $"📦 {item.AvailableQuantity} in stock";
+
+
+                        summaryText = $"{item.ItemName} • {stockInfo}";
+                    }
+
+                    // Draw text with proper padding
+                    Rectangle textBounds = new Rectangle(
+                        fullBounds.X + 10,
+                        fullBounds.Y,
+                        fullBounds.Width - 20,
+                        fullBounds.Height
+                    );
+
+                    TextRenderer.DrawText(e.Graphics,
+                        summaryText,
+                        font,
+                        textBounds,
+                        Color.Black,
+                        TextFormatFlags.Left | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis);
+
+                    // Draw borders
+                    e.Graphics.DrawLine(borderPen, fullBounds.Left, fullBounds.Top, fullBounds.Right, fullBounds.Top);
+                    e.Graphics.DrawLine(borderPen, fullBounds.Left, fullBounds.Bottom - 1, fullBounds.Right, fullBounds.Bottom - 1);
+
                 }
             }
         }
-
         #endregion
 
-
         #region Items transfer GridView Data Manipulation
-        private List<ItemAtWarehouseSincePeriodDTO> ConfigureReportGridView(List<ItemAtWarehouseSincePeriodDTO> allData)
+        private List<ItemRemainingDaysForExpirationDTO> ConfigureReportGridView(List<ItemRemainingDaysForExpirationDTO> allData)
         {
+            // First group by Warehouse, then by ItemCode, then sort items by ExpiryDate within each group
             var groupedData = allData
-                .GroupBy(x => new { x.ItemCode, x.WarehouseId, x.AvailableQuantity })
-                .OrderBy(g => g.Key.ItemCode)
-                .OrderBy(f => f.Key.WarehouseId)
+                .GroupBy(x => new { x.WarehouseId, x.WarehouseName })  // Primary grouping by Warehouse
+                .OrderBy(w => w.Key.WarehouseId)  // Sort warehouses by ID (or Name if preferred)
+                .Select(warehouseGroup => new
+                {
+                    Warehouse = warehouseGroup.Key,
+                    Items = warehouseGroup
+                        .GroupBy(x => new { x.ItemCode, x.ItemName })  // Secondary grouping by Item
+                        .OrderBy(i => i.Key.ItemCode)  // Sort items by Code
+                        .Select(itemGroup => new
+                        {
+                            Item = itemGroup.Key,
+                            Entries = itemGroup.OrderBy(e => e.ExpiryDate)  // Sort entries by ExpiryDate
+                        })
+                })
                 .ToList();
 
-            var displayList = new List<ItemAtWarehouseSincePeriodDTO>();
+            var displayList = new List<ItemRemainingDaysForExpirationDTO>();
 
-            foreach (var group in groupedData)
+            foreach (var warehouseGroup in groupedData)
             {
-                displayList.Add(new ItemAtWarehouseSincePeriodDTO
+                // Add Warehouse summary row (optional)
+                displayList.Add(new ItemRemainingDaysForExpirationDTO
                 {
-                    ItemCode = group.Key.ItemCode,
-                    ItemName = group.First().ItemName,
-                    WarehouseId = group.Key.WarehouseId,
-                    WarehouseName = group.First().WarehouseName,
-                    AvailableQuantity = group.Key.AvailableQuantity,
-                    IsSummaryRow = true
+                    WarehouseId = warehouseGroup.Warehouse.WarehouseId,
+                    WarehouseName = warehouseGroup.Warehouse.WarehouseName,
+                    IsSummaryRow = true,
+                    IsWarehouseSummary = true  // Add this property to your DTO if needed
                 });
 
-                // Add detail rows
-                displayList.AddRange(group);
+                foreach (var itemGroup in warehouseGroup.Items)
+                {
+                    // Add Item summary row
+                    displayList.Add(new ItemRemainingDaysForExpirationDTO
+                    {
+                        ItemCode = itemGroup.Item.ItemCode,
+                        ItemName = itemGroup.Item.ItemName,
+                        WarehouseId = warehouseGroup.Warehouse.WarehouseId,
+                        WarehouseName = warehouseGroup.Warehouse.WarehouseName,
+                        AvailableQuantity = itemGroup.Entries.Sum(e => e.AvailableQuantity),
+                        IsSummaryRow = true
+                    });
 
+                    // Add all entries for this item (sorted by ExpiryDate)
+                    displayList.AddRange(itemGroup.Entries);
+                }
             }
+
             return displayList;
         }
         #endregion
