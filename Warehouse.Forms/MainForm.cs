@@ -41,6 +41,7 @@ namespace WarehouseManagmentSystem.WinForms
             // Reports Menu
             ToolStripMenuItem reportsMenu = new ToolStripMenuItem("Reports");
             reportsMenu.DropDownItems.Add("Warehouse Report", null, (s, e) => OpenForm(new WarehousReportForm()));
+            reportsMenu.DropDownItems.Add("Item Report", null, (s, e) => OpenForm(new ItemReportForm()));
 
             // Add all main menu items
             mainMenu.Items.AddRange(new ToolStripItem[] {
