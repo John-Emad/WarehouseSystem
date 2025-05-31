@@ -1,25 +1,33 @@
-﻿using WarehouseManagementSystem.Data.Context;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using WarehouseManagementSystem.Data.Context;
 using WarehouseManagementSystem.Data.Repositories;
 using WarehouseManagementSystem.Domain.DTOs;
 using WarehouseManagementSystem.Domain.Models;
 
 namespace WarehouseManagmentSystem.WinForms.ReportForms
 {
-    public partial class ItemReportForm : Form
+    public partial class ItemTransferReportForm : Form
     {
         #region Fields
-        private string SelectedItemCode;
         private DateOnly StartReportDate;
         private DateOnly EndReportDate;
         private List<int> SelectedWarehousesIDs = new List<int>();
         #endregion
-        public ItemReportForm()
+        public ItemTransferReportForm()
         {
             InitializeComponent();
             HideUI();
         }
 
-        private async void ItemReportForm_Load(object sender, EventArgs e)
+        private async void ItemTransferReportForm_Load(object sender, EventArgs e)
         {
             await InitializeDataAsync();
         }
@@ -28,20 +36,7 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
         #region Initialize Data
         private async Task InitializeDataAsync()
         {
-            await AddItemsToComboBoxAsync();
             await AddWarehousesToCheckBoxList();
-        }
-        private async Task AddItemsToComboBoxAsync()
-        {
-            using (var context = new WarehouseDbContext())
-            {
-                var repo = new ItemRepository(context);
-                var Items = await repo.GetAllAsync();
-                ReportForItemsComboBox.DisplayMember = "Name";
-                ReportForItemsComboBox.ValueMember = "Code";
-                ReportForItemsComboBox.DataSource = Items;
-            }
-            ReportForItemsComboBox.SelectedIndex = -1;
         }
         private async Task AddWarehousesToCheckBoxList()
         {
@@ -93,16 +88,6 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
                 ToDateLabel.Visible = false;
             }
         }
-        private void ReportForItemsComboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (ReportForItemsComboBox.SelectedIndex != -1 && ReportForItemsComboBox.SelectedItem is Item selectedItem)
-            {
-                if (ReportForItemsComboBox.SelectedValue is null) return;
-
-
-                SelectedItemCode = ReportForItemsComboBox.SelectedValue?.ToString();
-            }
-        }
         private void ReportForWarehousesCheckBoxList_ItemCheck(object sender, ItemCheckEventArgs e)
         {
             // Delay the update until after the check state is changed
@@ -125,14 +110,14 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
         {
             using var context = new WarehouseDbContext();
             var _customizedQueriesRepository = new CustomizedQueriesRepositroy(context);
-            if(WithinRangeDateCheckBox.Checked)
+            if (WithinRangeDateCheckBox.Checked)
             {
-                var items = await _customizedQueriesRepository.GetItemDetailsWithinWarehousesWithinDateRange(SelectedItemCode, SelectedWarehousesIDs, StartReportDate, EndReportDate);
+                var items = await _customizedQueriesRepository.GetAllItemDetailsWithinWarehousesWithinDateRange(SelectedWarehousesIDs, StartReportDate, EndReportDate);
                 ReportViewGridView.DataSource = ConfigureReportGridView(items);
             }
             else
             {
-                var items = await _customizedQueriesRepository.GetItemDetailsWithinWarehouses(SelectedItemCode, SelectedWarehousesIDs);
+                var items = await _customizedQueriesRepository.GetAllItemDetailsWithinWarehouses(SelectedWarehousesIDs);
                 ReportViewGridView.DataSource = ConfigureReportGridView(items);
             }
 
@@ -168,14 +153,8 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
             }
             return true;
         }
-        private bool IsValidItemsReport()
+        private bool IsValidItemsTransferReport()
         {
-            if(ReportForItemsComboBox.SelectedIndex == -1)
-            {
-                MessageBox.Show("The Item must be Chosen first", "Validation Error",
-                                MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return false;
-            }
 
             if (ReportForWarehousesCheckBoxList.CheckedItems.Count == 0)
             {
@@ -216,11 +195,11 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
                 ReportViewGridView.Columns["FromWarehouseId"].Visible = false;
 
 
-            if (ReportViewGridView.Columns.Contains("MovementType"))
-                ReportViewGridView.Columns["MovementType"].Visible = false;
-
             if (ReportViewGridView.Columns.Contains("Warehouse"))
                 ReportViewGridView.Columns["Warehouse"].Visible = false;
+
+            if (ReportViewGridView.Columns.Contains("CurrentQuantity"))
+                ReportViewGridView.Columns["CurrentQuantity"].Visible = false;
 
 
             if (ReportViewGridView.Columns.Contains("IsSummaryRow"))
@@ -231,7 +210,7 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
 
         private void ActionButton_Click(object sender, EventArgs e)
         {
-            if(IsValidItemsReport())
+            if (IsValidItemsTransferReport())
             {
                 ReportChosenItemAtChosenWarehouses();
             }
@@ -279,7 +258,7 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
                 // Prevent default painting for all cells in summary row
                 e.Handled = true;
 
-                if (grid.Columns[e.ColumnIndex].Name == "CurrentQuantity")
+                if (grid.Columns[e.ColumnIndex].Name == "Quantity")
                 {
                     // Calculate the full row width
                     int totalWidth = 0;
@@ -301,7 +280,7 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
                     {
                         e.Graphics.FillRectangle(backBrush, fullBounds);
 
-                        string summaryText = $"📦 {item.ItemName}   |   🏭 Warehouse: {item.Warehouse}   |   🚚 Movement: {item.MovementType}";
+                        string summaryText = $"📦 {item.ItemName}   |   🏭 {item.Warehouse}";
 
                         TextRenderer.DrawText(e.Graphics,
                             summaryText,
@@ -316,16 +295,15 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
             }
         }
 
-
         #endregion
 
 
-        #region Item GridView Data Manipulation
+        #region Items transfer GridView Data Manipulation
         private List<ItemMovementReportDTO> ConfigureReportGridView(List<ItemMovementReportDTO> allData)
         {
             var groupedData = allData
-                .GroupBy(x => new {x.ItemCode, x.Warehouse, x.MovementType })
-                .OrderBy(g => g.Key.Warehouse)
+                .GroupBy(x => new { x.ItemCode, x.Warehouse})
+                .OrderBy(g => g.Key.ItemCode)
                 .ToList();
 
             var displayList = new List<ItemMovementReportDTO>();
@@ -337,7 +315,6 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
                     ItemCode = group.First().ItemCode,
                     ItemName = group.First().ItemName,
                     Warehouse = group.Key.Warehouse,
-                    MovementType = group.Key.MovementType,
                     IsSummaryRow = true
                 });
 
@@ -350,3 +327,4 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
         #endregion
     }
 }
+
