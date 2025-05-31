@@ -18,10 +18,9 @@ namespace WarehouseManagementSystem.Domain.DTOs
         public int? ToWarehouseId { get; set; }
         public string ToWarehouseName { get; set; }
         public decimal Quantity { get; set; }
-
-
         public string RelatedPerson { get; set; } // Supplier/Customer name
 
+        public bool IsSummaryRow {  get; set; }
 
     }
 }
