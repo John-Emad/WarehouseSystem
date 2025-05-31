@@ -71,23 +71,17 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
 
         private void ReportForComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            switch (reportsEnum)
+            if (ReportForComboBox.SelectedIndex != -1 && ReportForComboBox.SelectedItem is Warehouse selectedWarehouse)
             {
-                case ReportsEnum.Warehouse:
-                    if (ReportForComboBox.SelectedIndex != -1 &&
-                ReportForComboBox.SelectedItem is Warehouse selectedWarehouse)
-                    {
-                        if (ReportForComboBox.SelectedValue == null) return;
+                if (ReportForComboBox.SelectedValue == null) return;
 
 
-                        SelectedWarehouseId = (int)ReportForComboBox.SelectedValue;
-                    }
-                    break;
+                SelectedWarehouseId = (int)ReportForComboBox.SelectedValue;
             }
         }
         #endregion
 
-        #region Hide Elements
+        #region Hide Columns
         private void HideUnnecessaryWarehouseDataColumns()
         {
             foreach (DataGridViewColumn column in ReportViewGridView.Columns)
