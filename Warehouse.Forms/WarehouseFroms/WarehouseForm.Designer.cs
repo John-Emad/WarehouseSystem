@@ -134,7 +134,7 @@
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             AutoSize = true;
-            ClientSize = new Size(1454, 597);
+            ClientSize = new Size(2313, 1152);
             Controls.Add(AssignManagerCheckBox);
             Controls.Add(WarehouseManagerComboBox);
             Controls.Add(AssignManagerLabel);

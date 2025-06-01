@@ -1,4 +1,5 @@
 ﻿using WarehouseManagmentSystem.WinForms.Forms;
+using WarehouseManagmentSystem.WinForms.ItemsForms;
 using WarehouseManagmentSystem.WinForms.ReportForms;
 using WarehouseManagmentSystem.WinForms.WarehouseFroms;
 
@@ -26,7 +27,8 @@ namespace WarehouseManagmentSystem.WinForms
 
             // Item Menu
             ToolStripMenuItem itemMenu = new ToolStripMenuItem("Item");
-            itemMenu.DropDownItems.Add("Manage Items", null, (s, e) => OpenForm(new ItemForm()));
+            itemMenu.DropDownItems.Add("Add Items", null, (s, e) => OpenForm(new ItemForm()));
+            itemMenu.DropDownItems.Add("Edit Items", null, (s, e) => OpenForm(new EditItemForm()));
 
             // Warehouse Menu
             ToolStripMenuItem warehouseMenu = new ToolStripMenuItem("Warehouse");
