@@ -1,5 +1,6 @@
 ﻿using WarehouseManagmentSystem.WinForms.Forms;
 using WarehouseManagmentSystem.WinForms.ReportForms;
+using WarehouseManagmentSystem.WinForms.WarehouseFroms;
 
 namespace WarehouseManagmentSystem.WinForms
 {
@@ -29,7 +30,8 @@ namespace WarehouseManagmentSystem.WinForms
 
             // Warehouse Menu
             ToolStripMenuItem warehouseMenu = new ToolStripMenuItem("Warehouse");
-            warehouseMenu.DropDownItems.Add("Manage Warehouses", null, (s, e) => OpenForm(new WarehouseForm()));
+            warehouseMenu.DropDownItems.Add("Add Warehouses", null, (s, e) => OpenForm(new WarehouseForm()));
+            warehouseMenu.DropDownItems.Add("Edit Warehouses", null, (s, e) => OpenForm(new EditWarehouseForm()));
 
 
             // Voucher Menu
