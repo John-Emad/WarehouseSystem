@@ -29,6 +29,16 @@ namespace WarehouseManagementSystem.Data.Repositories
         {
             return await _personSet.OfType<Customer>().ToListAsync();
         }
+
+        public async Task<Supplier> GetSupplierByPKAsync(int id)
+        {
+            return  _personSet.OfType<Supplier>().Where(i => i.Id == id).FirstOrDefault();
+        }
+
+        public async Task<Customer> GetCustomerByPKAsync(int id)
+        {
+            return  _personSet.OfType<Customer>().Where(i => i.Id == id).FirstOrDefault();
+        }
         #endregion
     }
 }
