@@ -23,6 +23,13 @@ namespace WarehouseManagementSystem.Data.Repositories
         {
             return await _warehouseSet.Include(w => w.ResponsiblePerson).ToListAsync();
         }
+
+        public async Task<Warehouse> GetByPKAsyncWithManagerName(int id)
+        {
+            return await _warehouseSet
+                .Include(w => w.ResponsiblePerson) // Add this line
+                .FirstOrDefaultAsync(w => w.Id == id);
+        }
         #endregion
     }
 }

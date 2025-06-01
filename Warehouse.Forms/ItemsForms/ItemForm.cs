@@ -41,46 +41,32 @@ namespace WarehouseManagmentSystem.WinForms
         }
         private async void AddItemButton_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(ItemCodeTextBox.Text))
+            if(IsValidForm())
             {
-                MessageBox.Show("Item Code is required", "Validation Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-            if (string.IsNullOrWhiteSpace(ItemNameTextBox.Text))
-            {
-                MessageBox.Show("Item name is required", "Validation Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-            if (SelectedUnits.Count == 0)
-            {
-                MessageBox.Show("At least one item unit must be selected", "Validation Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-            try
-            {
-                var Item = new Item
+                try
                 {
-                    Name = ItemNameTextBox.Text,
-                    Code = ItemCodeTextBox.Text,
-                    MeasurementUnits = new List<MeasurementUnit>(SelectedUnits)
-                };
+                    var Item = new Item
+                    {
+                        Name = ItemNameTextBox.Text,
+                        Code = ItemCodeTextBox.Text,
+                        MeasurementUnits = new List<MeasurementUnit>(SelectedUnits)
+                    };
 
-                using (var context = new WarehouseDbContext())
-                {
-                    var itemRepository = new ItemRepository(context);
-                    await itemRepository.AddAsync(Item); 
+                    using (var context = new WarehouseDbContext())
+                    {
+                        var itemRepository = new ItemRepository(context);
+                        await itemRepository.AddAsync(Item);
+                    }
+                    LoadItemsToGridView();
+                    ResetEnteredData();
                 }
-                LoadItemsToGridView();
-                ResetEnteredData();
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error adding Item: {ex.Message}", "Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error adding Item: {ex.Message}", "Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            
         }
         private void ResetEnteredData()
         {
@@ -109,6 +95,32 @@ namespace WarehouseManagmentSystem.WinForms
                 }
             }));
         }
+
+        #region Validations
+        private bool IsValidForm()
+        {
+            if (string.IsNullOrWhiteSpace(ItemCodeTextBox.Text))
+            {
+                MessageBox.Show("Item Code is required", "Validation Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
+            if (string.IsNullOrWhiteSpace(ItemNameTextBox.Text))
+            {
+                MessageBox.Show("Item name is required", "Validation Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
+            if (SelectedUnits.Count == 0)
+            {
+                MessageBox.Show("At least one item unit must be selected", "Validation Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
+            return true;
+        }
+
+        #endregion
         #endregion
     }
 }

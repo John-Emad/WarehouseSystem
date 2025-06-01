@@ -1,5 +1,8 @@
 ﻿using WarehouseManagmentSystem.WinForms.Forms;
+using WarehouseManagmentSystem.WinForms.ItemsForms;
+using WarehouseManagmentSystem.WinForms.PeopleForms;
 using WarehouseManagmentSystem.WinForms.ReportForms;
+using WarehouseManagmentSystem.WinForms.WarehouseFroms;
 
 namespace WarehouseManagmentSystem.WinForms
 {
@@ -21,15 +24,21 @@ namespace WarehouseManagmentSystem.WinForms
 
             // Person Menu
             ToolStripMenuItem personMenu = new ToolStripMenuItem("Person");
-            personMenu.DropDownItems.Add("Manage people", null, (s, e) => OpenForm(new PersonForm()));
+            personMenu.DropDownItems.Add("Add Customer", null, (s, e) => OpenForm(new AddCustomerForm()));
+            personMenu.DropDownItems.Add("Edit Customer", null, (s, e) => OpenForm(new EditCustomerForm()));
+            personMenu.DropDownItems.Add("Add Supplier", null, (s, e) => OpenForm(new AddSupplierForm()));
+            personMenu.DropDownItems.Add("Edit Supplier", null, (s, e) => OpenForm(new EditSupplierForm()));
+
 
             // Item Menu
             ToolStripMenuItem itemMenu = new ToolStripMenuItem("Item");
-            itemMenu.DropDownItems.Add("Manage Items", null, (s, e) => OpenForm(new ItemForm()));
+            itemMenu.DropDownItems.Add("Add Items", null, (s, e) => OpenForm(new ItemForm()));
+            itemMenu.DropDownItems.Add("Edit Items", null, (s, e) => OpenForm(new EditItemForm()));
 
             // Warehouse Menu
             ToolStripMenuItem warehouseMenu = new ToolStripMenuItem("Warehouse");
-            warehouseMenu.DropDownItems.Add("Manage Warehouses", null, (s, e) => OpenForm(new WarehouseForm()));
+            warehouseMenu.DropDownItems.Add("Add Warehouses", null, (s, e) => OpenForm(new WarehouseForm()));
+            warehouseMenu.DropDownItems.Add("Edit Warehouses", null, (s, e) => OpenForm(new EditWarehouseForm()));
 
 
             // Voucher Menu

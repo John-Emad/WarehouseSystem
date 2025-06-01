@@ -9,8 +9,8 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
     public partial class ItemAtWarehouseDaysTillExpirationReportForm : Form
     {
         #region Fields
-        private int DaysPeriod;
-        private DateOnly StartReportDate;
+        //private int DaysPeriod;
+        //private DateOnly StartReportDate;
         private List<int> SelectedWarehousesIDs = new List<int>();
         #endregion
         public ItemAtWarehouseDaysTillExpirationReportForm()
@@ -48,29 +48,29 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
         #region UI
         private void HideUI()
         {
-            FromDateLabel.Visible = false;
-            ReportStartDateDatePicker.Visible = false;
+            //FromDateLabel.Visible = false;
+            //ReportStartDateDatePicker.Visible = false;
         }
         #endregion
 
         #region Event Handlers (Checkbox, ComboBox, CheckboxList)
-        private void ChooseDateCheckBox_ChechStateChanged(object sender, EventArgs e)
-        {
-            if (ChooseDateInsteadCheckBox.Checked)
-            {
-                PeriodDaysLabel.Visible = false;
-                PeriodDaysTextBox.Visible = false;
-                FromDateLabel.Visible = true;
-                ReportStartDateDatePicker.Visible = true;
-            }
-            else
-            {
-                PeriodDaysLabel.Visible = true;
-                PeriodDaysTextBox.Visible = true;
-                FromDateLabel.Visible = false;
-                ReportStartDateDatePicker.Visible = false;
-            }
-        }
+        //private void ChooseDateCheckBox_ChechStateChanged(object sender, EventArgs e)
+        //{
+        //    if (ChooseDateInsteadCheckBox.Checked)
+        //    {
+        //        PeriodDaysLabel.Visible = false;
+        //        PeriodDaysTextBox.Visible = false;
+        //        FromDateLabel.Visible = true;
+        //        ReportStartDateDatePicker.Visible = true;
+        //    }
+        //    else
+        //    {
+        //        PeriodDaysLabel.Visible = true;
+        //        PeriodDaysTextBox.Visible = true;
+        //        FromDateLabel.Visible = false;
+        //        ReportStartDateDatePicker.Visible = false;
+        //    }
+        //}
         private void ReportForWarehousesCheckBoxList_ItemCheck(object sender, ItemCheckEventArgs e)
         {
             // Delay the update until after the check state is changed
@@ -94,7 +94,7 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
             using var context = new WarehouseDbContext();
             var _customizedQueriesRepository = new CustomizedQueriesRepositroy(context);
 
-            var items = await _customizedQueriesRepository.GetAllAvailableItemAtWarehouseExpiration(SelectedWarehousesIDs, StartReportDate);
+            var items = await _customizedQueriesRepository.GetAllAvailableItemAtWarehouseExpiration(SelectedWarehousesIDs);
             ReportViewGridView.DataSource = ConfigureReportGridView(items);
 
             HideUnnecessaryWarehouseDataColumns();
@@ -102,18 +102,18 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
         }
 
         #region Validations
-        private bool IsValideDates()
-        {
-            if (string.IsNullOrWhiteSpace(ReportStartDateDatePicker.Text))
-            {
-                MessageBox.Show("Must Specify the start date", "Validation Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return false;
-            }
-            StartReportDate = DateOnly.FromDateTime(ReportStartDateDatePicker.Value.Date);
+        //private bool IsValideDates()
+        //{
+        //    if (string.IsNullOrWhiteSpace(ReportStartDateDatePicker.Text))
+        //    {
+        //        MessageBox.Show("Must Specify the start date", "Validation Error",
+        //            MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        //        return false;
+        //    }
+        //    StartReportDate = DateOnly.FromDateTime(ReportStartDateDatePicker.Value.Date);
 
-            return true;
-        }
+        //    return true;
+        //}
         private bool IsValidItemsAtWarehouseSincePeriodReport()
         {
 
@@ -124,41 +124,41 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
                 return false;
             }
 
-            if (ChooseDateInsteadCheckBox.Checked)
-            {
-                if (!IsValideDates())
-                {
-                    return false;
-                }
-            }
-            else
-            {
-                if (!IsValidPeriodDays())
-                {
-                    return false;
-                }
-            }
+            //if (ChooseDateInsteadCheckBox.Checked)
+            //{
+            //    if (!IsValideDates())
+            //    {
+            //        return false;
+            //    }
+            //}
+            //else
+            //{
+            //    if (!IsValidPeriodDays())
+            //    {
+            //        return false;
+            //    }
+            //}
             return true;
         }
 
-        private bool IsValidPeriodDays()
-        {
-            if (string.IsNullOrEmpty(PeriodDaysTextBox.Text))
-            {
-                MessageBox.Show("Must type a period days number", "Validation Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return false;
-            }
+        //private bool IsValidPeriodDays()
+        //{
+        //    if (string.IsNullOrEmpty(PeriodDaysTextBox.Text))
+        //    {
+        //        MessageBox.Show("Must type a period days number", "Validation Error",
+        //            MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        //        return false;
+        //    }
 
-            if (!int.TryParse(PeriodDaysTextBox.Text, out DaysPeriod) || DaysPeriod < 0)
-            {
-                MessageBox.Show("Must be 0 or more days in a whole number", "Validation Error",
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return false;
-            }
-            StartReportDate = DateOnly.FromDateTime(DateTime.Now).AddDays(-DaysPeriod);
-            return true;
-        }
+        //    if (!int.TryParse(PeriodDaysTextBox.Text, out DaysPeriod) || DaysPeriod < 0)
+        //    {
+        //        MessageBox.Show("Must be 0 or more days in a whole number", "Validation Error",
+        //                MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        //        return false;
+        //    }
+        //    StartReportDate = DateOnly.FromDateTime(DateTime.Now).AddDays(-DaysPeriod);
+        //    return true;
+        //}
         #endregion
 
         #region Hide Columns
@@ -310,57 +310,59 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
         #region Items transfer GridView Data Manipulation
         private List<ItemRemainingDaysForExpirationDTO> ConfigureReportGridView(List<ItemRemainingDaysForExpirationDTO> allData)
         {
-            // First group by Warehouse, then by ItemCode, then sort items by ExpiryDate within each group
-            var groupedData = allData
-                .GroupBy(x => new { x.WarehouseId, x.WarehouseName })  // Primary grouping by Warehouse
-                .OrderBy(w => w.Key.WarehouseId)  // Sort warehouses by ID (or Name if preferred)
-                .Select(warehouseGroup => new
-                {
-                    Warehouse = warehouseGroup.Key,
-                    Items = warehouseGroup
-                        .GroupBy(x => new { x.ItemCode, x.ItemName })  // Secondary grouping by Item
-                        .OrderBy(i => i.Key.ItemCode)  // Sort items by Code
-                        .Select(itemGroup => new
-                        {
-                            Item = itemGroup.Key,
-                            Entries = itemGroup.OrderBy(e => e.ExpiryDate)  // Sort entries by ExpiryDate
-                        })
-                })
-                .ToList();
-
             var displayList = new List<ItemRemainingDaysForExpirationDTO>();
 
-            foreach (var warehouseGroup in groupedData)
+            // First group by warehouse
+            var warehouseGroups = allData
+                .Where(x => x.WarehouseId != null) // Filter out NULL entries
+                .GroupBy(x => new { x.WarehouseId, x.WarehouseName})
+                .OrderBy(g => g.Key.WarehouseId)
+                .ToList();
+
+            foreach (var warehouseGroup in warehouseGroups)
             {
-                // Add Warehouse summary row (optional)
+                // Add warehouse summary row
                 displayList.Add(new ItemRemainingDaysForExpirationDTO
                 {
-                    WarehouseId = warehouseGroup.Warehouse.WarehouseId,
-                    WarehouseName = warehouseGroup.Warehouse.WarehouseName,
+                    WarehouseId = warehouseGroup.Key.WarehouseId,
+                    WarehouseName = warehouseGroup.First().WarehouseName,
                     IsSummaryRow = true,
-                    IsWarehouseSummary = true  // Add this property to your DTO if needed
+                    IsWarehouseSummary = true
                 });
 
-                foreach (var itemGroup in warehouseGroup.Items)
+                // Then group items within this warehouse
+                var itemGroups = warehouseGroup
+                    .GroupBy(x => new { x.ItemCode, x.ItemName, x.ProductionDate, x.ExpiryDate })
+                    .OrderBy(g => g.Key.ItemCode)
+                    .ToList();
+
+                foreach (var itemGroup in itemGroups)
                 {
-                    // Add Item summary row
+                    // Add item summary row (showing total quantity for the item in this warehouse)
                     displayList.Add(new ItemRemainingDaysForExpirationDTO
                     {
-                        ItemCode = itemGroup.Item.ItemCode,
-                        ItemName = itemGroup.Item.ItemName,
-                        WarehouseId = warehouseGroup.Warehouse.WarehouseId,
-                        WarehouseName = warehouseGroup.Warehouse.WarehouseName,
-                        AvailableQuantity = itemGroup.Entries.Sum(e => e.AvailableQuantity),
+                        ItemCode = itemGroup.Key.ItemCode,
+                        ItemName = itemGroup.Key.ItemName,
+                        AvailableQuantity = itemGroup.First().AvailableQuantity,
                         IsSummaryRow = true
                     });
 
-                    // Add all entries for this item (sorted by ExpiryDate)
-                    displayList.AddRange(itemGroup.Entries);
+                    // Add detailed rows (grouped by production/expiry batches)
+                    var batchGroups = itemGroup
+                        .GroupBy(x => new { x.ProductionDate, x.ExpiryDate })
+                        .OrderBy(g => g.Key.ExpiryDate); // Sort batches by expiry date
+
+                    foreach (var batchGroup in batchGroups)
+                    {
+                        displayList.AddRange(batchGroup);
+                    }
                 }
             }
 
             return displayList;
         }
+
+
         #endregion
 
     }

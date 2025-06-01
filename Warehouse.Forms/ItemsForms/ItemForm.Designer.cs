@@ -42,7 +42,7 @@
             // ItemCodeTextBox
             // 
             ItemCodeTextBox.AccessibleName = "ItemCodeTextBox";
-            ItemCodeTextBox.Location = new Point(184, 174);
+            ItemCodeTextBox.Location = new Point(497, 401);
             ItemCodeTextBox.Name = "ItemCodeTextBox";
             ItemCodeTextBox.Size = new Size(150, 27);
             ItemCodeTextBox.TabIndex = 0;
@@ -50,7 +50,7 @@
             // ItemNameTextBox
             // 
             ItemNameTextBox.AccessibleName = "ItemNameTextBox";
-            ItemNameTextBox.Location = new Point(184, 267);
+            ItemNameTextBox.Location = new Point(497, 494);
             ItemNameTextBox.Name = "ItemNameTextBox";
             ItemNameTextBox.Size = new Size(150, 27);
             ItemNameTextBox.TabIndex = 1;
@@ -59,7 +59,7 @@
             // 
             ItemCodeLabel.AccessibleName = "ItemCodeLabel";
             ItemCodeLabel.AutoSize = true;
-            ItemCodeLabel.Location = new Point(30, 181);
+            ItemCodeLabel.Location = new Point(343, 408);
             ItemCodeLabel.Name = "ItemCodeLabel";
             ItemCodeLabel.Size = new Size(44, 20);
             ItemCodeLabel.TabIndex = 3;
@@ -69,7 +69,7 @@
             // 
             ItemNameLabel.AccessibleName = "ItemNameLabel";
             ItemNameLabel.AutoSize = true;
-            ItemNameLabel.Location = new Point(30, 274);
+            ItemNameLabel.Location = new Point(343, 501);
             ItemNameLabel.Name = "ItemNameLabel";
             ItemNameLabel.Size = new Size(49, 20);
             ItemNameLabel.TabIndex = 4;
@@ -79,7 +79,7 @@
             // 
             ItemMeasuringUnitsLabel.AccessibleName = "ItemMeasuringUnitsLabel";
             ItemMeasuringUnitsLabel.AutoSize = true;
-            ItemMeasuringUnitsLabel.Location = new Point(30, 389);
+            ItemMeasuringUnitsLabel.Location = new Point(343, 616);
             ItemMeasuringUnitsLabel.Name = "ItemMeasuringUnitsLabel";
             ItemMeasuringUnitsLabel.Size = new Size(115, 20);
             ItemMeasuringUnitsLabel.TabIndex = 5;
@@ -90,7 +90,7 @@
             ItemsDataGridView.AccessibleName = "ItemsDataGridView";
             ItemsDataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             ItemsDataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            ItemsDataGridView.Location = new Point(454, 22);
+            ItemsDataGridView.Location = new Point(767, 249);
             ItemsDataGridView.Name = "ItemsDataGridView";
             ItemsDataGridView.RowHeadersWidth = 51;
             ItemsDataGridView.Size = new Size(1174, 487);
@@ -99,11 +99,11 @@
             // AddItemButton
             // 
             AddItemButton.AccessibleName = "AddItemButton";
-            AddItemButton.Location = new Point(454, 535);
+            AddItemButton.Location = new Point(1233, 780);
             AddItemButton.Name = "AddItemButton";
             AddItemButton.Size = new Size(174, 29);
             AddItemButton.TabIndex = 7;
-            AddItemButton.Text = "AddAsync";
+            AddItemButton.Text = "Add Item";
             AddItemButton.UseVisualStyleBackColor = true;
             AddItemButton.Click += AddItemButton_Click;
             // 
@@ -111,7 +111,7 @@
             // 
             ItemMeasuringUnitsCheckList.AccessibleName = "ItemMeasuringUnitsCheckList";
             ItemMeasuringUnitsCheckList.FormattingEnabled = true;
-            ItemMeasuringUnitsCheckList.Location = new Point(184, 395);
+            ItemMeasuringUnitsCheckList.Location = new Point(497, 622);
             ItemMeasuringUnitsCheckList.Name = "ItemMeasuringUnitsCheckList";
             ItemMeasuringUnitsCheckList.Size = new Size(150, 114);
             ItemMeasuringUnitsCheckList.TabIndex = 8;
@@ -122,7 +122,7 @@
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             AutoSize = true;
-            ClientSize = new Size(1640, 557);
+            ClientSize = new Size(2334, 1152);
             Controls.Add(ItemMeasuringUnitsCheckList);
             Controls.Add(AddItemButton);
             Controls.Add(ItemsDataGridView);

@@ -36,6 +36,7 @@
             WarehouseAddressLabel = new Label();
             AssignManagerLabel = new Label();
             WarehouseManagerComboBox = new ComboBox();
+            AssignManagerCheckBox = new CheckBox();
             ((System.ComponentModel.ISupportInitialize)warehouseDataGridView).BeginInit();
             SuspendLayout();
             // 
@@ -69,11 +70,11 @@
             // btnAddWarehouse
             // 
             btnAddWarehouse.AccessibleName = "btnAddWarehouse";
-            btnAddWarehouse.Location = new Point(950, 513);
+            btnAddWarehouse.Location = new Point(931, 513);
             btnAddWarehouse.Name = "btnAddWarehouse";
-            btnAddWarehouse.Size = new Size(94, 29);
+            btnAddWarehouse.Size = new Size(177, 29);
             btnAddWarehouse.TabIndex = 3;
-            btnAddWarehouse.Text = "AddAsync";
+            btnAddWarehouse.Text = "Add Warehouse";
             btnAddWarehouse.UseVisualStyleBackColor = true;
             btnAddWarehouse.Click += btnAddWarehouse_Click;
             // 
@@ -101,7 +102,7 @@
             // 
             AssignManagerLabel.AccessibleName = "AssignManagerLabel";
             AssignManagerLabel.AutoSize = true;
-            AssignManagerLabel.Location = new Point(25, 273);
+            AssignManagerLabel.Location = new Point(25, 325);
             AssignManagerLabel.Name = "AssignManagerLabel";
             AssignManagerLabel.Size = new Size(115, 20);
             AssignManagerLabel.TabIndex = 6;
@@ -111,10 +112,21 @@
             // 
             WarehouseManagerComboBox.AccessibleName = "WarehouseManagerComboBox";
             WarehouseManagerComboBox.FormattingEnabled = true;
-            WarehouseManagerComboBox.Location = new Point(191, 273);
+            WarehouseManagerComboBox.Location = new Point(191, 325);
             WarehouseManagerComboBox.Name = "WarehouseManagerComboBox";
             WarehouseManagerComboBox.Size = new Size(150, 28);
             WarehouseManagerComboBox.TabIndex = 7;
+            // 
+            // AssignManagerCheckBox
+            // 
+            AssignManagerCheckBox.AutoSize = true;
+            AssignManagerCheckBox.Location = new Point(25, 282);
+            AssignManagerCheckBox.Name = "AssignManagerCheckBox";
+            AssignManagerCheckBox.Size = new Size(137, 24);
+            AssignManagerCheckBox.TabIndex = 8;
+            AssignManagerCheckBox.Text = "Assign Manager";
+            AssignManagerCheckBox.UseVisualStyleBackColor = true;
+            AssignManagerCheckBox.CheckStateChanged += AssignManagerCheckBox_CheckStateChanged;
             // 
             // WarehouseForm
             // 
@@ -122,7 +134,8 @@
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             AutoSize = true;
-            ClientSize = new Size(1454, 597);
+            ClientSize = new Size(2313, 1152);
+            Controls.Add(AssignManagerCheckBox);
             Controls.Add(WarehouseManagerComboBox);
             Controls.Add(AssignManagerLabel);
             Controls.Add(WarehouseAddressLabel);
@@ -135,6 +148,7 @@
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Warehouses";
             WindowState = FormWindowState.Maximized;
+            Load += WarehouseForm_Load;
             ((System.ComponentModel.ISupportInitialize)warehouseDataGridView).EndInit();
             ResumeLayout(false);
             PerformLayout();
@@ -150,5 +164,6 @@
         private Label WarehouseAddressLabel;
         private Label AssignManagerLabel;
         private ComboBox WarehouseManagerComboBox;
+        private CheckBox AssignManagerCheckBox;
     }
 }
