@@ -19,5 +19,6 @@ namespace WarehouseManagementSystem.Domain.DTOs
 
         public decimal AvailableQuantity { get; set; } 
         public bool IsSummaryRow { get; set; }
+        public bool IsWarehouseSummary {  get; set; }
     }
 }
