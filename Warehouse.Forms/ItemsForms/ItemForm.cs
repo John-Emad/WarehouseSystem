@@ -111,7 +111,8 @@ namespace WarehouseManagmentSystem.WinForms
                         }
                         LoadItemsToGridView();
                         ResetEnteredData();
-                        MessageBox.Show($"Item added successfully!");
+                        MessageBox.Show("Item Added successfully!", "Success",
+                            MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                     catch (Exception ex)
                     {

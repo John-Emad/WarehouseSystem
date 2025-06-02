@@ -17,9 +17,7 @@ namespace WarehouseManagmentSystem.WinForms.WarehouseFroms
             InitializeComponent();
             HideUI();
             UnenableControlsTillSelecting();
-
-
-            WarehouseManagerComboBox.SelectedIndex = -1;
+            ApplyAnchorsAndDocking();
         }
         #endregion
 
@@ -47,6 +45,29 @@ namespace WarehouseManagmentSystem.WinForms.WarehouseFroms
             btnEditWarehouse.Enabled = true;
             AssignManagerCheckBox.Enabled = true;
         }
+        private void ApplyAnchorsAndDocking()
+        {
+            // TextBoxes should stretch horizontally
+            WarehouseNameTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            WarehouseAddressTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+
+            // ComboBox should stretch horizontally
+            WarehouseManagerComboBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+
+            // CheckBox should stretch horizontallyshould stretch horizontally
+            AssignManagerCheckBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+
+            // Label should stretch horizontally
+            WarehouseNameLabel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            WarehouseAddressLabel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            AssignManagerLabel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+
+            // Button should stay at the bottom right
+            btnEditWarehouse.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+
+            // DataGridView should expand to fill the bottom area
+            warehouseDataGridView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+        }
         #endregion
 
         #region Load and Reset Data
@@ -57,8 +78,7 @@ namespace WarehouseManagmentSystem.WinForms.WarehouseFroms
         }
         private async Task LoadWarehousesToGridViewAsync()
         {
-            using (var context = new WarehouseDbContext())
-            {
+            using var context = new WarehouseDbContext();           
                 var warehouseRepository = new WarehouseRepository(context);
                 var warehouses = await warehouseRepository.GetAllAsyncWithManagerName();
                 warehouseDataGridView.DataSource = warehouses.Select(w => new
@@ -70,7 +90,7 @@ namespace WarehouseManagmentSystem.WinForms.WarehouseFroms
                 }).ToList();
                 // Hide the Id column if you don't want it visible
                 warehouseDataGridView.Columns["Id"].Visible = false;
-            }
+                warehouseDataGridView.Columns["ResponsiblePerson"].HeaderText = "Manager";           
         }
         private async Task LoadPersonsToComboBox()
         {
@@ -105,6 +125,11 @@ namespace WarehouseManagmentSystem.WinForms.WarehouseFroms
                     WarehouseManagerComboBox.SelectedIndex = -1;
                 }
             }
+        }
+        private async void EditWarehouseForm_Load(object sender, EventArgs e)
+        {
+            await LoadDataAsync();
+            WarehouseManagerComboBox.SelectedIndex = -1;
         }
         private void ResetEnteredData()
         {
@@ -179,7 +204,6 @@ namespace WarehouseManagmentSystem.WinForms.WarehouseFroms
             }
         }
 
-
         private void AssignManagerCheckBox_CheckStateChanged(object sender, EventArgs e)
         {
             if (AssignManagerCheckBox.Checked)
@@ -223,13 +247,6 @@ namespace WarehouseManagmentSystem.WinForms.WarehouseFroms
             return true;
         }
         #endregion
-
-
-        private async void EditWarehouseForm_Load(object sender, EventArgs e)
-        {
-            await LoadDataAsync();
-        }
-
 
         #endregion
     }

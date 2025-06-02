@@ -28,75 +28,135 @@
         /// </summary>
         private void InitializeComponent()
         {
-            AssignManagerCheckBox = new CheckBox();
+            warehouseDataGridView = new DataGridView();
+            tableLayoutPanel1 = new TableLayoutPanel();
+            WarehouseNameLabel = new Label();
             WarehouseManagerComboBox = new ComboBox();
+            AssignManagerCheckBox = new CheckBox();
             AssignManagerLabel = new Label();
             WarehouseAddressLabel = new Label();
-            WarehouseNameLabel = new Label();
+            WarehouseNameTextBox = new TextBox();
             btnEditWarehouse = new Button();
             WarehouseAddressTextBox = new TextBox();
-            WarehouseNameTextBox = new TextBox();
-            warehouseDataGridView = new DataGridView();
             ((System.ComponentModel.ISupportInitialize)warehouseDataGridView).BeginInit();
+            tableLayoutPanel1.SuspendLayout();
             SuspendLayout();
             // 
-            // AssignManagerCheckBox
+            // warehouseDataGridView
             // 
-            AssignManagerCheckBox.AutoSize = true;
-            AssignManagerCheckBox.Location = new Point(7, 278);
-            AssignManagerCheckBox.Name = "AssignManagerCheckBox";
-            AssignManagerCheckBox.Size = new Size(137, 24);
-            AssignManagerCheckBox.TabIndex = 17;
-            AssignManagerCheckBox.Text = "Assign Manager";
-            AssignManagerCheckBox.UseVisualStyleBackColor = true;
-            AssignManagerCheckBox.CheckStateChanged += AssignManagerCheckBox_CheckStateChanged;
+            warehouseDataGridView.AccessibleName = "warehouseDataGridView";
+            warehouseDataGridView.AllowUserToAddRows = false;
+            warehouseDataGridView.AllowUserToDeleteRows = false;
+            warehouseDataGridView.AllowUserToOrderColumns = true;
+            warehouseDataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            warehouseDataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            warehouseDataGridView.Dock = DockStyle.Top;
+            warehouseDataGridView.Location = new Point(0, 0);
+            warehouseDataGridView.Name = "warehouseDataGridView";
+            warehouseDataGridView.ReadOnly = true;
+            warehouseDataGridView.RowHeadersWidth = 51;
+            warehouseDataGridView.Size = new Size(2306, 420);
+            warehouseDataGridView.TabIndex = 9;
+            warehouseDataGridView.CellDoubleClick += warehouseDataGridView_CellDoubleClick;
+            // 
+            // tableLayoutPanel1
+            // 
+            tableLayoutPanel1.ColumnCount = 6;
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 16.666666F));
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 8.14996F));
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25.1018753F));
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 16.666666F));
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 16.666666F));
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 16.666666F));
+            tableLayoutPanel1.Controls.Add(WarehouseNameLabel, 0, 0);
+            tableLayoutPanel1.Controls.Add(WarehouseManagerComboBox, 2, 6);
+            tableLayoutPanel1.Controls.Add(AssignManagerCheckBox, 0, 4);
+            tableLayoutPanel1.Controls.Add(AssignManagerLabel, 0, 6);
+            tableLayoutPanel1.Controls.Add(WarehouseAddressLabel, 0, 2);
+            tableLayoutPanel1.Controls.Add(WarehouseNameTextBox, 2, 0);
+            tableLayoutPanel1.Controls.Add(btnEditWarehouse, 4, 5);
+            tableLayoutPanel1.Controls.Add(WarehouseAddressTextBox, 2, 2);
+            tableLayoutPanel1.Font = new Font("Segoe UI", 10F);
+            tableLayoutPanel1.Location = new Point(0, 450);
+            tableLayoutPanel1.Margin = new Padding(10, 3, 3, 3);
+            tableLayoutPanel1.Name = "tableLayoutPanel1";
+            tableLayoutPanel1.RowCount = 8;
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 12.5F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 12.5F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 12.5F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 12.5F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 12.5F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 12.5F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 12.5F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 12.5F));
+            tableLayoutPanel1.Size = new Size(1227, 389);
+            tableLayoutPanel1.TabIndex = 10;
+            // 
+            // WarehouseNameLabel
+            // 
+            WarehouseNameLabel.AccessibleName = "WarehouseNameLabel";
+            WarehouseNameLabel.AutoSize = true;
+            WarehouseNameLabel.Location = new Point(3, 0);
+            WarehouseNameLabel.Name = "WarehouseNameLabel";
+            WarehouseNameLabel.Size = new Size(56, 23);
+            WarehouseNameLabel.TabIndex = 4;
+            WarehouseNameLabel.Text = "Name";
             // 
             // WarehouseManagerComboBox
             // 
             WarehouseManagerComboBox.AccessibleName = "WarehouseManagerComboBox";
             WarehouseManagerComboBox.FormattingEnabled = true;
-            WarehouseManagerComboBox.Location = new Point(173, 321);
+            WarehouseManagerComboBox.Location = new Point(307, 291);
             WarehouseManagerComboBox.Name = "WarehouseManagerComboBox";
-            WarehouseManagerComboBox.Size = new Size(150, 28);
-            WarehouseManagerComboBox.TabIndex = 16;
+            WarehouseManagerComboBox.Size = new Size(302, 31);
+            WarehouseManagerComboBox.TabIndex = 7;
+            // 
+            // AssignManagerCheckBox
+            // 
+            AssignManagerCheckBox.AutoSize = true;
+            AssignManagerCheckBox.Location = new Point(3, 195);
+            AssignManagerCheckBox.Name = "AssignManagerCheckBox";
+            AssignManagerCheckBox.Size = new Size(154, 27);
+            AssignManagerCheckBox.TabIndex = 8;
+            AssignManagerCheckBox.Text = "Assign Manager";
+            AssignManagerCheckBox.UseVisualStyleBackColor = true;
+            AssignManagerCheckBox.CheckStateChanged += AssignManagerCheckBox_CheckStateChanged;
             // 
             // AssignManagerLabel
             // 
             AssignManagerLabel.AccessibleName = "AssignManagerLabel";
             AssignManagerLabel.AutoSize = true;
-            AssignManagerLabel.Location = new Point(7, 321);
+            AssignManagerLabel.Location = new Point(3, 288);
             AssignManagerLabel.Name = "AssignManagerLabel";
-            AssignManagerLabel.Size = new Size(115, 20);
-            AssignManagerLabel.TabIndex = 15;
+            AssignManagerLabel.Size = new Size(132, 23);
+            AssignManagerLabel.TabIndex = 6;
             AssignManagerLabel.Text = "Assign Manager";
             // 
             // WarehouseAddressLabel
             // 
             WarehouseAddressLabel.AccessibleName = "WarehouseAddressLabel";
             WarehouseAddressLabel.AutoSize = true;
-            WarehouseAddressLabel.Location = new Point(7, 164);
+            WarehouseAddressLabel.Location = new Point(3, 96);
             WarehouseAddressLabel.Name = "WarehouseAddressLabel";
-            WarehouseAddressLabel.Size = new Size(62, 20);
-            WarehouseAddressLabel.TabIndex = 14;
+            WarehouseAddressLabel.Size = new Size(70, 23);
+            WarehouseAddressLabel.TabIndex = 5;
             WarehouseAddressLabel.Text = "Address";
             // 
-            // WarehouseNameLabel
+            // WarehouseNameTextBox
             // 
-            WarehouseNameLabel.AccessibleName = "WarehouseNameLabel";
-            WarehouseNameLabel.AutoSize = true;
-            WarehouseNameLabel.Location = new Point(7, 68);
-            WarehouseNameLabel.Name = "WarehouseNameLabel";
-            WarehouseNameLabel.Size = new Size(49, 20);
-            WarehouseNameLabel.TabIndex = 13;
-            WarehouseNameLabel.Text = "Name";
+            WarehouseNameTextBox.AccessibleName = "WarehouseNameTextBox";
+            WarehouseNameTextBox.Location = new Point(307, 3);
+            WarehouseNameTextBox.Name = "WarehouseNameTextBox";
+            WarehouseNameTextBox.Size = new Size(302, 30);
+            WarehouseNameTextBox.TabIndex = 1;
             // 
             // btnEditWarehouse
             // 
             btnEditWarehouse.AccessibleName = "btnEditWarehouse";
-            btnEditWarehouse.Location = new Point(913, 509);
+            btnEditWarehouse.Location = new Point(819, 243);
             btnEditWarehouse.Name = "btnEditWarehouse";
             btnEditWarehouse.Size = new Size(177, 29);
-            btnEditWarehouse.TabIndex = 12;
+            btnEditWarehouse.TabIndex = 3;
             btnEditWarehouse.Text = "Edit Warehouse";
             btnEditWarehouse.UseVisualStyleBackColor = true;
             btnEditWarehouse.Click += btnEditWarehouse_Click;
@@ -104,63 +164,40 @@
             // WarehouseAddressTextBox
             // 
             WarehouseAddressTextBox.AccessibleName = "WarehouseAddressTextBox";
-            WarehouseAddressTextBox.Location = new Point(173, 157);
+            WarehouseAddressTextBox.Location = new Point(307, 99);
             WarehouseAddressTextBox.Name = "WarehouseAddressTextBox";
-            WarehouseAddressTextBox.Size = new Size(150, 27);
-            WarehouseAddressTextBox.TabIndex = 11;
-            // 
-            // WarehouseNameTextBox
-            // 
-            WarehouseNameTextBox.AccessibleName = "WarehouseNameTextBox";
-            WarehouseNameTextBox.Location = new Point(173, 61);
-            WarehouseNameTextBox.Name = "WarehouseNameTextBox";
-            WarehouseNameTextBox.Size = new Size(150, 27);
-            WarehouseNameTextBox.TabIndex = 10;
-            // 
-            // warehouseDataGridView
-            // 
-            warehouseDataGridView.AccessibleName = "warehouseDataGridView";
-            warehouseDataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-            warehouseDataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            warehouseDataGridView.Location = new Point(578, 8);
-            warehouseDataGridView.Name = "warehouseDataGridView";
-            warehouseDataGridView.RowHeadersWidth = 51;
-            warehouseDataGridView.Size = new Size(828, 435);
-            warehouseDataGridView.TabIndex = 9;
-            warehouseDataGridView.CellDoubleClick += warehouseDataGridView_CellDoubleClick;
+            WarehouseAddressTextBox.Size = new Size(302, 30);
+            WarehouseAddressTextBox.TabIndex = 2;
             // 
             // EditWarehouseForm
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1412, 546);
-            Controls.Add(AssignManagerCheckBox);
-            Controls.Add(WarehouseManagerComboBox);
-            Controls.Add(AssignManagerLabel);
-            Controls.Add(WarehouseAddressLabel);
-            Controls.Add(WarehouseNameLabel);
-            Controls.Add(btnEditWarehouse);
-            Controls.Add(WarehouseAddressTextBox);
-            Controls.Add(WarehouseNameTextBox);
+            AutoSize = true;
+            ClientSize = new Size(2306, 1153);
+            Controls.Add(tableLayoutPanel1);
             Controls.Add(warehouseDataGridView);
             Name = "EditWarehouseForm";
-            Text = "EditWarehouseForm";
+            StartPosition = FormStartPosition.CenterParent;
+            Text = "Edit Warehouse";
+            WindowState = FormWindowState.Maximized;
             Load += EditWarehouseForm_Load;
             ((System.ComponentModel.ISupportInitialize)warehouseDataGridView).EndInit();
+            tableLayoutPanel1.ResumeLayout(false);
+            tableLayoutPanel1.PerformLayout();
             ResumeLayout(false);
-            PerformLayout();
         }
 
         #endregion
-
-        private CheckBox AssignManagerCheckBox;
+        private DataGridView warehouseDataGridView;
+        private TableLayoutPanel tableLayoutPanel1;
+        private Label WarehouseNameLabel;
         private ComboBox WarehouseManagerComboBox;
+        private CheckBox AssignManagerCheckBox;
         private Label AssignManagerLabel;
         private Label WarehouseAddressLabel;
-        private Label WarehouseNameLabel;
+        private TextBox WarehouseNameTextBox;
         private Button btnEditWarehouse;
         private TextBox WarehouseAddressTextBox;
-        private TextBox WarehouseNameTextBox;
-        private DataGridView warehouseDataGridView;
     }
 }

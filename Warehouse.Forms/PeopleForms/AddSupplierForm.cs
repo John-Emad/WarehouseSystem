@@ -105,7 +105,8 @@ namespace WarehouseManagmentSystem.WinForms.PeopleForms
                         await personRepository.AddAsync(supplier);
                         ResetFormEnteredData();
                         LoadPeopleToGridView();
-                        MessageBox.Show($"Supplier added successfully!");
+                        MessageBox.Show("Supplier Added successfully!", "Success",
+                            MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                     catch (Exception ex)
                     {
