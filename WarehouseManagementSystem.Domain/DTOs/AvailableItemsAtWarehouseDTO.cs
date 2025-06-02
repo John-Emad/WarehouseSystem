@@ -18,9 +18,9 @@ namespace WarehouseManagementSystem.Domain.DTOs
         public DateOnly ProductionDate { get; set; }
         public DateOnly ExpiryDate { get; set; }
 
-        //public override string ToString()
-        //{
-        //    return $"Item: {ItemName}\tQuantity: {ItemQuantity}";
-        //}
+        public override string ToString()
+        {
+            return $"Item: {ItemName} - Quantity: {ItemQuantity}";
+        }
     }
 }

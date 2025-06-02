@@ -9,6 +9,11 @@ namespace WarehouseManagementSystem.Domain.DTOs
         public DateTime ProductionDate { get; set; }
         public DateTime ExpiryDate { get; set; }
 
+        public override string ToString()
+        {
+            return $"Item: {Name} - Quantity: {Quantity}";
+        }
+
     }
 
 }

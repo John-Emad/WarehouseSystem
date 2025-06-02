@@ -16,8 +16,8 @@ namespace WarehouseManagmentSystem.WinForms.PeopleForms
         {
             SelectedSupplier = new Supplier();
             InitializeComponent();
-            LoadSuppliersToGridView();
             UnenableControlsTillSelecting();
+            ApplyAnchorsAndDocking();
         }
         #endregion
 
@@ -57,6 +57,37 @@ namespace WarehouseManagmentSystem.WinForms.PeopleForms
             UserEmailTextBox.Clear();
             UserWebsiteTextBox.Clear();
         }
+        private void EditSupplierForm_Load(object sender, EventArgs e)
+        {
+            LoadSuppliersToGridView();
+        }
+        #endregion
+
+        #region UI 
+        private void ApplyAnchorsAndDocking()
+        {
+            // TextBoxes should stretch horizontally
+            UserNameTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            UserMobileTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            UserLandlineTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            UserFaxTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            UserEmailTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            UserWebsiteTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+
+            // Label should stretch horizontally
+            UserNameLabel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            UserMobileLabel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            UserLandlineLabel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            UserFaxLabel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            UserEmailLabel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            UserWebsiteLabel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+
+            // Button should stay at the bottom right
+            AddUserButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+
+            // DataGridView should expand to fill the bottom area
+            SupplierDataGridView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+        }
         #endregion
 
         #region Enable Unenable Controls
@@ -92,6 +123,7 @@ namespace WarehouseManagmentSystem.WinForms.PeopleForms
         }
         #endregion
 
+        #region Button event handler
         private async void UpdateSupplierButton_Click(object sender, EventArgs e)
         {
             if (SelectedSupplier == null)
@@ -144,7 +176,8 @@ namespace WarehouseManagmentSystem.WinForms.PeopleForms
                     }
                 }
             }
-        }
+        } 
+        #endregion
 
         #region Validations
         private bool IsValidForm()
@@ -214,5 +247,8 @@ namespace WarehouseManagmentSystem.WinForms.PeopleForms
             }
         }
         #endregion
+
+
+
     }
 }

@@ -17,13 +17,33 @@ namespace WarehouseManagmentSystem.WinForms.ItemsForms
         {
             SelectedUnits = new List<MeasurementUnit>();
             InitializeComponent();
-            LoadItemsToGridView();
-            LoadMeasuringUnitsToCheckBox();
             UnenableControlsTillSelecting();
+            ApplyAnchorsAndDocking();
         }
         #endregion
 
         #region Methods
+
+        #region UI 
+        private void ApplyAnchorsAndDocking()
+        {
+            // TextBoxes should stretch horizontally
+            ItemNameTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            ItemCodeTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            ItemMeasuringUnitsCheckList.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+
+            // Label should stretch horizontally
+            ItemNameLabel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            ItemCodeLabel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            ItemMeasuringUnitsLabel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+
+            // Button should stay at the bottom right
+            EditItemButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+
+            // DataGridView should expand to fill the bottom area
+            ItemsDataGridView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+        }
+        #endregion
 
         #region UI Controls
         private void UnenableControlsTillSelecting()
@@ -53,12 +73,17 @@ namespace WarehouseManagmentSystem.WinForms.ItemsForms
                 i.Name,
                 MeasurementUnits = string.Join(", ", i.MeasurementUnits),
             }).ToList();
+            ItemsDataGridView.Columns["MeasurementUnits"].HeaderText = "Measuring Units";
         }
         private void LoadMeasuringUnitsToCheckBox()
         {
             ItemMeasuringUnitsCheckList.DataSource = Enum.GetValues(typeof(MeasurementUnit));
         }
-
+        private void EditItemForm_Load(object sender, EventArgs e)
+        {
+            LoadItemsToGridView();
+            LoadMeasuringUnitsToCheckBox();
+        }
         private async void LoadItemData(string itemCode)
         {
             using var context = new WarehouseDbContext();
@@ -115,6 +140,7 @@ namespace WarehouseManagmentSystem.WinForms.ItemsForms
         }
         #endregion
 
+        #region Button CheckList event handlers
         private async void EditItemButton_Click(object sender, EventArgs e)
         {
             if (SelectedItem == null)
@@ -184,8 +210,8 @@ namespace WarehouseManagmentSystem.WinForms.ItemsForms
                     SelectedUnits.Remove(currentItem);
                 }
             }));
-        }
-
+        } 
+        #endregion
 
         #region Validations
         private bool IsValidForm()
@@ -213,5 +239,7 @@ namespace WarehouseManagmentSystem.WinForms.ItemsForms
 
         #endregion
         #endregion
+
+
     }
 }

@@ -11,8 +11,9 @@ namespace WarehouseManagmentSystem.WinForms
     public partial class IssueVoucherForm : Form
     {
         #region Fields
-        List<AvailableItemsAtWarehouseDTO> AvailableItemsAtWarehouseList;
+        private List<AvailableItemsAtWarehouseDTO> AvailableItemsAtWarehouseList;
         private List<AvailableItemsAtWarehouseDTO> SelectedItemsList;
+        private bool isFormLoading = false;
         private int warehouseId;
         #endregion
 
@@ -23,7 +24,6 @@ namespace WarehouseManagmentSystem.WinForms
             SelectedItemsList = new List<AvailableItemsAtWarehouseDTO>();
             InitializeComponent();
             IssueSelectedItemsGridView.KeyDown += IssueSelectedItemsGridView_KeyDown;
-            this.Load += IssueVoucherForm_Load;
         }
         #endregion
 
@@ -36,6 +36,8 @@ namespace WarehouseManagmentSystem.WinForms
             try
             {
                 await LoadData();
+                IssueVoucherCustomerComboBox.SelectedIndex = -1;
+                IssueVoucherWarehouseComboBox.SelectedIndex = -1;
             }
             catch (Exception ex)
             {
@@ -49,6 +51,7 @@ namespace WarehouseManagmentSystem.WinForms
         }
         private async Task LoadWareHousesToComboBox()
         {
+            isFormLoading = true;
             using var context = new WarehouseDbContext();
             var _warehouseRepository = new WarehouseRepository(context);
             List<Warehouse> warehouses = new List<Warehouse>();
@@ -56,17 +59,16 @@ namespace WarehouseManagmentSystem.WinForms
             IssueVoucherWarehouseComboBox.DisplayMember = "Name";
             IssueVoucherWarehouseComboBox.ValueMember = "Id";
             IssueVoucherWarehouseComboBox.DataSource = warehouses;
+            isFormLoading = false;
         }
         private async Task LoadCustomersToComboBox()
         {
-            using (var context = new WarehouseDbContext())
-            {
-                var repo = new PersonRepository(context);
-                var customers = await repo.GetCustomersAsync();
-                IssueVoucherCustomerComboBox.DisplayMember = "Name";
-                IssueVoucherCustomerComboBox.ValueMember = "Id";
-                IssueVoucherCustomerComboBox.DataSource = customers;
-            }
+            using var context = new WarehouseDbContext();
+            var repo = new PersonRepository(context);
+            var customers = await repo.GetCustomersAsync();
+            IssueVoucherCustomerComboBox.DisplayMember = "Name";
+            IssueVoucherCustomerComboBox.ValueMember = "Id";
+            IssueVoucherCustomerComboBox.DataSource = customers;
         }
         #endregion
 
@@ -78,16 +80,18 @@ namespace WarehouseManagmentSystem.WinForms
             AvailableItemsAtWarehouseList = await _customizedQueriesRepositroy.GetAvailableItemsAtWarehouseWithSupplierTransferAsync(WareHouseId);
             IssueVoucherItemsGridView.DataSource = AvailableItemsAtWarehouseList;
 
-            HideIssueVoucherItemsGridViewColumns();
+            EditIssueVoucherItemsGridViewColumns();
 
         }
-        private void HideIssueVoucherItemsGridViewColumns()
+        private void EditIssueVoucherItemsGridViewColumns()
         {
-            foreach (DataGridViewColumn column in IssueSelectedItemsGridView.Columns)
+
+            if (IssueSelectedItemsGridView.Columns.Contains("ItemQuantity"))
             {
-                column.ReadOnly = true;
+                IssueSelectedItemsGridView.Columns["ItemQuantity"].ReadOnly = false;
             }
 
+            #region Hide
             if (IssueVoucherItemsGridView.Columns.Contains("ItemCode"))
                 IssueVoucherItemsGridView.Columns["ItemCode"].Visible = false;
 
@@ -99,17 +103,25 @@ namespace WarehouseManagmentSystem.WinForms
 
             if (IssueVoucherItemsGridView.Columns.Contains("SupplierId"))
                 IssueVoucherItemsGridView.Columns["SupplierId"].Visible = false;
+            #endregion
+
+            #region Rename Columns
+            // Rename
+            if (IssueVoucherItemsGridView.Columns.Contains("ItemName"))
+                IssueVoucherItemsGridView.Columns["ItemName"].HeaderText = "Item";
+
+            if (IssueVoucherItemsGridView.Columns.Contains("SupplierName"))
+                IssueVoucherItemsGridView.Columns["SupplierName"].HeaderText = "Supplier";
+
+            if (IssueVoucherItemsGridView.Columns.Contains("ItemQuantity"))
+                IssueVoucherItemsGridView.Columns["ItemQuantity"].HeaderText = "In Stock";
 
             if (IssueVoucherItemsGridView.Columns.Contains("ProductionDate"))
-                IssueVoucherItemsGridView.Columns["ProductionDate"].Visible = false;
+                IssueVoucherItemsGridView.Columns["ProductionDate"].HeaderText = "Prod Date";
 
             if (IssueVoucherItemsGridView.Columns.Contains("ExpiryDate"))
-                IssueVoucherItemsGridView.Columns["ExpiryDate"].Visible = false;
-
-            if (IssueSelectedItemsGridView.Columns.Contains("ItemQuantity"))
-            {
-                IssueSelectedItemsGridView.Columns["ItemQuantity"].ReadOnly = false;
-            }
+                IssueVoucherItemsGridView.Columns["ExpiryDate"].HeaderText = "Exp Date";
+            #endregion
         }
         private void IssueVoucherItemsGridView_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
@@ -145,37 +157,55 @@ namespace WarehouseManagmentSystem.WinForms
                 IssueSelectedItemsGridView.DataSource = null;
                 IssueSelectedItemsGridView.DataSource = SelectedItemsList;
 
-                HideIssueSelectedItemsGridViewColumns();
+                EditIssueSelectedItemsGridViewColumns();
 
                 selectedRow.DefaultCellStyle.BackColor = Color.LightGreen;
             }
         }
-        private async void IssueVoucherAddToWarehouseButton_Click(object sender, EventArgs e)
+        private async void IssueVoucherRemoveFromWarehouseButton_Click(object sender, EventArgs e)
         {
-            if (!IsValidIssue())
-                return;
-            using var context = new WarehouseDbContext();
-            var transaction = await context.Database.BeginTransactionAsync();
-            try
+            if (IsValidIssue())
             {
-                await AddToIssueVoucherAndDetailsTable();
-                await UpdateQuantites();
-                await transaction.CommitAsync();
+                // Create confirmation message
+                string message = $"Confirm Issue From Warehouse\n\n" +
+                               $"Warehouse: {IssueVoucherWarehouseComboBox.Text}\n" +
+                               $"Issue Date: {IssueVoucherIssueDate.Text}\n" +
+                               $"Issue Customer: {IssueVoucherCustomerComboBox.Text}\n" +
+                               $"Issue Items:\n{string.Join("\n", SelectedItemsList)}";
+
+                var result = MessageBox.Show(message, "Confirm Issue",
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+                if (result == DialogResult.Yes)
+                {
+                    using var context = new WarehouseDbContext();
+                    var transaction = await context.Database.BeginTransactionAsync();
+                    try
+                    {
+                        await AddToIssueVoucherAndDetailsTable();
+                        await UpdateQuantites();
+                        await transaction.CommitAsync();
+                        MessageBox.Show("Voucher created successfully!", "Success",
+                                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    catch
+                    {
+                        await transaction.RollbackAsync();
+                        MessageBox.Show("Voucher Failed!", "Fail",
+                                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+
+                    ResetIssueForm();
+                }
             }
-            catch
-            {
-                await transaction.RollbackAsync();
-                throw;
-            }
-            MessageBox.Show("Voucher created successfully!", "Success",
-                MessageBoxButtons.OK, MessageBoxIcon.Information);
-            ResetIssueForm();
+
         }
         #endregion
 
-        #region Selected Items Methods and events
-        private void HideIssueSelectedItemsGridViewColumns()
+        #region Selected Items Grid view Methods and events
+        private void EditIssueSelectedItemsGridViewColumns()
         {
+            #region Hide
             if (IssueSelectedItemsGridView.Columns.Contains("ItemCode"))
                 IssueSelectedItemsGridView.Columns["ItemCode"].Visible = false;
 
@@ -187,12 +217,25 @@ namespace WarehouseManagmentSystem.WinForms
 
             if (IssueSelectedItemsGridView.Columns.Contains("SupplierId"))
                 IssueSelectedItemsGridView.Columns["SupplierId"].Visible = false;
+            #endregion
+
+            #region Rename Columns
+            // Rename
+            if (IssueSelectedItemsGridView.Columns.Contains("ItemName"))
+                IssueSelectedItemsGridView.Columns["ItemName"].HeaderText = "Item";
+
+            if (IssueSelectedItemsGridView.Columns.Contains("SupplierName"))
+                IssueSelectedItemsGridView.Columns["SupplierName"].HeaderText = "Supplier";
+
+            if (IssueSelectedItemsGridView.Columns.Contains("ItemQuantity"))
+                IssueSelectedItemsGridView.Columns["ItemQuantity"].HeaderText = "Checkout Quantity";
 
             if (IssueSelectedItemsGridView.Columns.Contains("ProductionDate"))
-                IssueSelectedItemsGridView.Columns["ProductionDate"].Visible = false;
+                IssueSelectedItemsGridView.Columns["ProductionDate"].HeaderText = "Prod Date";
 
             if (IssueSelectedItemsGridView.Columns.Contains("ExpiryDate"))
-                IssueSelectedItemsGridView.Columns["ExpiryDate"].Visible = false;
+                IssueSelectedItemsGridView.Columns["ExpiryDate"].HeaderText = "Exp Date";
+            #endregion
         }
         private void IssueSelectedItemsGridView_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
@@ -282,7 +325,7 @@ namespace WarehouseManagmentSystem.WinForms
                             // Refresh grid
                             IssueSelectedItemsGridView.DataSource = null;
                             IssueSelectedItemsGridView.DataSource = SelectedItemsList;
-                            HideIssueSelectedItemsGridViewColumns();
+                            EditIssueSelectedItemsGridViewColumns();
                         }
                     }
                 }
@@ -324,7 +367,7 @@ namespace WarehouseManagmentSystem.WinForms
                         // Refresh selection grid
                         IssueSelectedItemsGridView.DataSource = null;
                         IssueSelectedItemsGridView.DataSource = SelectedItemsList;
-                        HideIssueSelectedItemsGridViewColumns();
+                        EditIssueSelectedItemsGridViewColumns();
                     }
                 }
             }
@@ -334,6 +377,7 @@ namespace WarehouseManagmentSystem.WinForms
         #region Warehouse ComboBox event handler
         private async void IssueVoucherWarehouseComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
+            if (isFormLoading) return;
             if (IssueVoucherWarehouseComboBox.SelectedValue == null) return;
             warehouseId = (int)IssueVoucherWarehouseComboBox.SelectedValue;
 
@@ -351,7 +395,7 @@ namespace WarehouseManagmentSystem.WinForms
             AvailableItemsAtWarehouseList.Clear();
             IssueVoucherWarehouseComboBox.SelectedIndex = -1;
             IssueVoucherCustomerComboBox.SelectedIndex = -1;
-            IssueVoucherIssueDate.Value = DateTime.Now;
+            IssueVoucherIssueDate.Text = "";
 
             IssueSelectedItemsGridView.DataSource = null;
             IssueSelectedItemsGridView.Refresh();
@@ -434,6 +478,8 @@ namespace WarehouseManagmentSystem.WinForms
                     VoucherId = issueVoucher.Id,
                     ItemCode = item.ItemCode,
                     Quantity = item.ItemQuantity,
+                    ProductionDate = item.ProductionDate,
+                    ExpiryDate = item.ExpiryDate,
                 };
 
                 await _issueVoucherDetailsRepository.AddAsync(detail);

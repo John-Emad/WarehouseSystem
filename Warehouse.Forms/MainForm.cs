@@ -22,60 +22,71 @@ namespace WarehouseManagmentSystem.WinForms
             this.MainMenuStrip = mainMenu;
             this.Controls.Add(mainMenu);
 
-            // Person Menu
+            // Person Menu with nested Customer/Supplier submenus
             ToolStripMenuItem personMenu = new ToolStripMenuItem("Person");
-            personMenu.DropDownItems.Add("Add Customer", null, (s, e) => OpenForm(new AddCustomerForm()));
-            personMenu.DropDownItems.Add("Edit Customer", null, (s, e) => OpenForm(new EditCustomerForm()));
-            personMenu.DropDownItems.Add("Add Supplier", null, (s, e) => OpenForm(new AddSupplierForm()));
-            personMenu.DropDownItems.Add("Edit Supplier", null, (s, e) => OpenForm(new EditSupplierForm()));
 
+            // Customer Submenu
+            ToolStripMenuItem customerMenu = new ToolStripMenuItem("Customer");
+            customerMenu.DropDownItems.Add("Add Customer", null, (s, e) => OpenForm(new AddCustomerForm()));
+            customerMenu.DropDownItems.Add("Edit Customer", null, (s, e) => OpenForm(new EditCustomerForm()));
 
-            // Item Menu
+            // Supplier Submenu
+            ToolStripMenuItem supplierMenu = new ToolStripMenuItem("Supplier");
+            supplierMenu.DropDownItems.Add("Add Supplier", null, (s, e) => OpenForm(new AddSupplierForm()));
+            supplierMenu.DropDownItems.Add("Edit Supplier", null, (s, e) => OpenForm(new EditSupplierForm()));
+
+            personMenu.DropDownItems.AddRange(new ToolStripItem[] { customerMenu, supplierMenu });
+
+            // Item Menu (unchanged)
             ToolStripMenuItem itemMenu = new ToolStripMenuItem("Item");
             itemMenu.DropDownItems.Add("Add Items", null, (s, e) => OpenForm(new ItemForm()));
             itemMenu.DropDownItems.Add("Edit Items", null, (s, e) => OpenForm(new EditItemForm()));
 
-            // Warehouse Menu
+            // Warehouse Menu (unchanged)
             ToolStripMenuItem warehouseMenu = new ToolStripMenuItem("Warehouse");
             warehouseMenu.DropDownItems.Add("Add Warehouses", null, (s, e) => OpenForm(new WarehouseForm()));
             warehouseMenu.DropDownItems.Add("Edit Warehouses", null, (s, e) => OpenForm(new EditWarehouseForm()));
 
-
-            // Voucher Menu
+            // Voucher Menu (unchanged)
             ToolStripMenuItem voucherMenu = new ToolStripMenuItem("Voucher");
             voucherMenu.DropDownItems.Add("Receipt Vouchers", null, (s, e) => OpenForm(new ReceiptVoucherForm()));
             voucherMenu.DropDownItems.Add("Transfer Vouchers", null, (s, e) => OpenForm(new TransferVoucherForm()));
             voucherMenu.DropDownItems.Add("Issue Vouchers", null, (s, e) => OpenForm(new IssueVoucherForm()));
 
-            // Reports Menu
+            // Reports Menu reorganized into Item/Warehouse categories
             ToolStripMenuItem reportsMenu = new ToolStripMenuItem("Reports");
-            reportsMenu.DropDownItems.Add("Warehouse Report", null, (s, e) => OpenForm(new WarehousReportForm()));
-            reportsMenu.DropDownItems.Add("Item Report", null, (s, e) => OpenForm(new ItemReportForm()));
-            reportsMenu.DropDownItems.Add("Item Transfer Report", null, (s, e) => OpenForm(new ItemTransferReportForm()));
-            reportsMenu.DropDownItems.Add("Item Since Period Report", null, (s, e) => OpenForm(new ItemAtWarehouseSincePeriodReportForm()));
-            reportsMenu.DropDownItems.Add("Item Remaining days for Expiration", null, (s, e) => OpenForm(new ItemAtWarehouseDaysTillExpirationReportForm()));
+
+            // Item Reports Submenu
+            ToolStripMenuItem itemReportsMenu = new ToolStripMenuItem("Item Reports");
+            itemReportsMenu.DropDownItems.Add("Item/Warehouse(s) Report", null, (s, e) => OpenForm(new ItemPerWarehouseReportForm()));
+            itemReportsMenu.DropDownItems.Add("Transfer Report", null, (s, e) => OpenForm(new ItemTransferReportForm()));
+            itemReportsMenu.DropDownItems.Add("Since Period Report", null, (s, e) => OpenForm(new ItemAtWarehouseSincePeriodReportForm()));
+            itemReportsMenu.DropDownItems.Add("Expiration Report", null, (s, e) => OpenForm(new ItemAtWarehouseDaysTillExpirationReportForm()));
+
+            // Warehouse Reports Submenu
+            ToolStripMenuItem warehouseReportsMenu = new ToolStripMenuItem("Warehouse Reports");
+            warehouseReportsMenu.DropDownItems.Add("Warehouse Report", null, (s, e) => OpenForm(new WarehousReportForm()));
+
+            reportsMenu.DropDownItems.AddRange(new ToolStripItem[] { itemReportsMenu, warehouseReportsMenu });
 
             // Add all main menu items
             mainMenu.Items.AddRange(new ToolStripItem[] {
-        personMenu,
-        itemMenu,
-        warehouseMenu,
-        voucherMenu,
-        reportsMenu
-    });
+                personMenu,
+                itemMenu,
+                warehouseMenu,
+                voucherMenu,
+                reportsMenu
+            });
         }
 
         private void OpenForm(Form childForm)
         {
-            // Close current active form if exists
             currentActiveForm?.Close();
 
-            // Set up new form
             childForm.TopLevel = false;
             childForm.FormBorderStyle = FormBorderStyle.None;
             childForm.Dock = DockStyle.Fill;
 
-            // Add to main form's panel
             panelMain.Controls.Add(childForm);
             panelMain.Tag = childForm;
 
@@ -83,11 +94,7 @@ namespace WarehouseManagmentSystem.WinForms
             childForm.Show();
 
             currentActiveForm = childForm;
-
-            // Optional: Update main form title
             this.Text = $"Warehouse Management System - {childForm.Text}";
         }
-
     }
-
 }

@@ -18,6 +18,12 @@ namespace WarehouseManagementSystem.Domain.Vouchers
         public string ItemCode { get; set; }
 
         [Required]
+        public DateOnly ProductionDate { get; set; }
+
+        [Required]
+        public DateOnly ExpiryDate { get; set; }
+
+        [Required]
         [Range(0.01, double.MaxValue)]
         public decimal Quantity { get; set; }
 

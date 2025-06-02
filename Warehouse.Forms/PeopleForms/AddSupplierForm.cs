@@ -14,11 +14,37 @@ namespace WarehouseManagmentSystem.WinForms.PeopleForms
         public AddSupplierForm()
         {
             InitializeComponent();
-            LoadPeopleToGridView();
+            ApplyAnchorsAndDocking();
         }
         #endregion
 
         #region Methods
+        #region UI 
+        private void ApplyAnchorsAndDocking()
+        {
+            // TextBoxes should stretch horizontally
+            UserNameTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            UserMobileTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            UserLandlineTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            UserFaxTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            UserEmailTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            UserWebsiteTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+
+            // Label should stretch horizontally
+            UserNameLabel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            UserMobileLabel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            UserLandlineLabel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            UserFaxLabel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            UserEmailLabel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            UserWebsiteLabel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+
+            // Button should stay at the bottom right
+            AddUserButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+
+            // DataGridView should expand to fill the bottom area
+            SuplierDataGridView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+        }
+        #endregion
 
         #region Load and Reset Data
         private async void LoadPeopleToGridView()
@@ -26,7 +52,7 @@ namespace WarehouseManagmentSystem.WinForms.PeopleForms
             using var context = new WarehouseDbContext();
             var peopleRepository = new PersonRepository(context);
             var suppliers = await peopleRepository.GetSuppliersAsync();
-            CustomerDataGridView.DataSource = suppliers;
+            SuplierDataGridView.DataSource = suppliers;
             HideColumns();
         }
         private void ResetFormEnteredData()
@@ -38,34 +64,55 @@ namespace WarehouseManagmentSystem.WinForms.PeopleForms
             UserEmailTextBox.Clear();
             UserWebsiteTextBox.Clear();
         }
+        private void AddSupplierForm_Load(object sender, EventArgs e)
+        {
+            LoadPeopleToGridView();
+        }
         #endregion
 
-        #region Add Customer Button Even handler
+        #region Add Supplier Button Even handler
         private async void AddUserButton_ClickAsync(object sender, EventArgs e)
         {
             if (IsValidForm())
             {
-                try
+                // Create confirmation message
+                string message = $"Confirm Adding Supplier\n\n" +
+                               $"Name:            {UserNameTextBox.Text}\n" +
+                               $"Landline number: {UserLandlineTextBox.Text}\n" +
+                               $"Fax number:      {UserFaxTextBox.Text}\n" +
+                               $"Mobile number:   {UserMobileTextBox.Text}\n" +
+                               $"Email number:    {UserEmailTextBox.Text}\n" +
+                               $"Website number:  {UserWebsiteTextBox.Text}\n";
+
+                var result = MessageBox.Show(message, "Confirm Adding",
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+                if (result == DialogResult.Yes)
                 {
-                    using var context = new WarehouseDbContext();
-                    var personRepository = new PersonRepository(context);
-                    Supplier supplier = new Supplier
+                    try
                     {
-                        Name = UserNameTextBox.Text,
-                        Landline = UserLandlineTextBox.Text,
-                        Fax = UserFaxTextBox.Text,
-                        Mobile = UserMobileTextBox.Text,
-                        Email = UserEmailTextBox.Text,
-                        Website = UserWebsiteTextBox.Text,
-                    };
-                    await personRepository.AddAsync(supplier);
-                    ResetFormEnteredData();
-                    LoadPeopleToGridView();
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Error adding Person: {ex.Message}", "Error",
-                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        using var context = new WarehouseDbContext();
+                        var personRepository = new PersonRepository(context);
+                        Supplier supplier = new Supplier
+                        {
+                            Name = UserNameTextBox.Text,
+                            Landline = UserLandlineTextBox.Text,
+                            Fax = UserFaxTextBox.Text,
+                            Mobile = UserMobileTextBox.Text,
+                            Email = UserEmailTextBox.Text,
+                            Website = UserWebsiteTextBox.Text,
+                        };
+                        await personRepository.AddAsync(supplier);
+                        ResetFormEnteredData();
+                        LoadPeopleToGridView();
+                        MessageBox.Show("Supplier Added successfully!", "Success",
+                            MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error adding Supplier: {ex.Message}", "Error",
+                            MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
                 }
             }
         }
@@ -135,14 +182,16 @@ namespace WarehouseManagmentSystem.WinForms.PeopleForms
         #region Hide unnecessary Columns
         private void HideColumns()
         {
-            if (CustomerDataGridView.Columns.Contains("Id"))
-                CustomerDataGridView.Columns["Id"].Visible = false;
+            if (SuplierDataGridView.Columns.Contains("Id"))
+                SuplierDataGridView.Columns["Id"].Visible = false;
 
-            if (CustomerDataGridView.Columns.Contains("ReceiptVouchers"))
-                CustomerDataGridView.Columns["ReceiptVouchers"].Visible = false;
+            if (SuplierDataGridView.Columns.Contains("ReceiptVouchers"))
+                SuplierDataGridView.Columns["ReceiptVouchers"].Visible = false;
         }
         #endregion
 
         #endregion
+
+
     }
 }

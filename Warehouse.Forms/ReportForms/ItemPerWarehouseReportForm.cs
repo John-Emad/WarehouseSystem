@@ -5,7 +5,7 @@ using WarehouseManagementSystem.Domain.Models;
 
 namespace WarehouseManagmentSystem.WinForms.ReportForms
 {
-    public partial class ItemReportForm : Form
+    public partial class ItemPerWarehouseReportForm : Form
     {
         #region Fields
         private string SelectedItemCode;
@@ -13,7 +13,7 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
         private DateOnly EndReportDate;
         private List<int> SelectedWarehousesIDs = new List<int>();
         #endregion
-        public ItemReportForm()
+        public ItemPerWarehouseReportForm()
         {
             InitializeComponent();
             HideUI();
@@ -226,6 +226,12 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
             if (ReportViewGridView.Columns.Contains("IsSummaryRow"))
                 ReportViewGridView.Columns["IsSummaryRow"].Visible = false;
 
+            if (ReportViewGridView.Columns.Contains("CurrentQuantity"))
+                ReportViewGridView.Columns["CurrentQuantity"].Visible = false;
+
+            if (ReportViewGridView.Columns.Contains("IsWarehouseSummary"))
+                ReportViewGridView.Columns["IsWarehouseSummary"].Visible = false;
+
         }
         #endregion
 
@@ -252,7 +258,6 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
                 }
             }
         }
-
         private void ReportViewGridView_DataError(object sender, DataGridViewDataErrorEventArgs e)
         {
             e.Cancel = true;
@@ -279,7 +284,7 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
                 // Prevent default painting for all cells in summary row
                 e.Handled = true;
 
-                if (grid.Columns[e.ColumnIndex].Name == "CurrentQuantity")
+                if (grid.Columns[e.ColumnIndex].Name == "Quantity")
                 {
                     // Calculate the full row width
                     // Calculate the full row width
@@ -307,7 +312,17 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
                     {
                         e.Graphics.FillRectangle(backBrush, fullBounds);
 
-                        string summaryText = $"📦 {item.ItemName}   |   🏭 {item.Warehouse}   |   🚚 {item.MovementType}";
+
+                        string summaryText;
+                        if (item.IsWarehouseSummary)
+                        {
+                            summaryText = $"🏭 {item.Warehouse}  |   📦 {item.CurrentQuantity} in stock";
+                        }
+                        else
+                        {
+                            summaryText = $"🚚 {item.MovementType}";
+                        }
+
 
                         Rectangle textBounds = new Rectangle(
                             fullBounds.X + 10,
@@ -331,37 +346,55 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
             }
         }
 
-
         #endregion
 
 
         #region Item GridView Data Manipulation
         private List<ItemMovementReportDTO> ConfigureReportGridView(List<ItemMovementReportDTO> allData)
         {
-            var groupedData = allData
-                .GroupBy(x => new {x.ItemCode, x.Warehouse, x.MovementType })
-                .OrderBy(g => g.Key.Warehouse)
-                .ToList();
-
             var displayList = new List<ItemMovementReportDTO>();
 
-            foreach (var group in groupedData)
+            // Group by Warehouse
+            var warehouseGroups = allData
+                .GroupBy(x => x.Warehouse)
+                .OrderBy(g => g.Key)
+                .ToList();
+
+            foreach (var warehouseGroup in warehouseGroups)
             {
+                // Add summary row for the warehouse
                 displayList.Add(new ItemMovementReportDTO
                 {
-                    ItemCode = group.First().ItemCode,
-                    ItemName = group.First().ItemName,
-                    Warehouse = group.Key.Warehouse,
-                    MovementType = group.Key.MovementType,
-                    IsSummaryRow = true
+                    Warehouse = warehouseGroup.Key,
+                    IsSummaryRow = true,
+                    IsWarehouseSummary = true,
+                    CurrentQuantity = warehouseGroup.First().CurrentQuantity,
                 });
 
-                // Add detail rows
-                displayList.AddRange(group);
+                // Group within each warehouse by MovementType
+                var movementTypeGroups = warehouseGroup
+                    .GroupBy(x => x.MovementType)
+                    .OrderBy(g => g.Key);
 
+                foreach (var movementGroup in movementTypeGroups)
+                {
+                    // Add summary row for the movement type
+                    displayList.Add(new ItemMovementReportDTO
+                    {
+                        Warehouse = warehouseGroup.Key,
+                        MovementType = movementGroup.Key,
+                        IsSummaryRow = true,
+                        ItemName = $"Summary for {movementGroup.Key}"
+                    });
+
+                    // Add detailed rows
+                    displayList.AddRange(movementGroup);
+                }
             }
+
             return displayList;
         }
+
         #endregion
     }
 }

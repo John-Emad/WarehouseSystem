@@ -15,7 +15,6 @@ namespace WarehouseManagmentSystem.WinForms
         private bool isFormLoading = false;
         private int fromWarehouseId;
         private int toWarehouseId;
-        //private int supplierId;
         #endregion
 
         #region Constructors
@@ -34,7 +33,6 @@ namespace WarehouseManagmentSystem.WinForms
         private async void TransferVoucherForm_LoadAsync(object? sender, EventArgs e)
         {
             await LoadTransferFromWarehousesComboBox();
-            //await LoadSuppliersToComboBox();
         }
         private void InitializeControllers()
         {
@@ -57,18 +55,6 @@ namespace WarehouseManagmentSystem.WinForms
             TransferFromWarehouseComboBox.SelectedIndex = -1;
             isFormLoading = false;
         }
-        //private async Task LoadSuppliersToComboBox()
-        //{
-        //    using (var context = new WarehouseDbContext())
-        //    {
-        //        var repo = new PersonRepository(context);
-        //        var suppliers = await repo.GetSuppliersAsync();
-        //        TransferSupplierComboBox.DisplayMember = "Name";
-        //        TransferSupplierComboBox.ValueMember = "Id";
-        //        TransferSupplierComboBox.DataSource = suppliers;
-        //    }
-        //    TransferSupplierComboBox.SelectedIndex = -1;
-        //}
 
         #endregion
 
@@ -99,11 +85,6 @@ namespace WarehouseManagmentSystem.WinForms
             if (TransferToWarehouseComboBox.SelectedValue == null) return;
             toWarehouseId = (int)TransferToWarehouseComboBox.SelectedValue;
         }
-        //private void TransferSupplierComboBox_SelectedIndexChanged(object sender, EventArgs e)
-        //{
-        //    if (TransferSupplierComboBox.SelectedValue == null) return;
-        //    supplierId = (int)TransferSupplierComboBox.SelectedValue;
-        //}
 
         private async Task UpdateTransferToComboBoxAsync()
         {
@@ -131,16 +112,14 @@ namespace WarehouseManagmentSystem.WinForms
             AvailableItemsAtWarehouseList.Clear();
             AvailableItemsAtWarehouseList = await _customizedQueriesRepositroy.GetAvailableItemsAtWarehouseWithSupplierTransferAsync(fromWarehouseId);
             TransferFromWarehouseGridView.DataSource = AvailableItemsAtWarehouseList;
-            HideTransferFromGridViewColumns();
+            EditTransferFromGridViewColumns();
         }
 
-        private void HideTransferFromGridViewColumns()
+        private void EditTransferFromGridViewColumns()
         {
-            foreach (DataGridViewColumn column in TransferFromWarehouseGridView.Columns)
-            {
-                column.ReadOnly = true;
-            }
 
+            #region Hide columns
+            // Hide
             if (TransferFromWarehouseGridView.Columns.Contains("ItemCode"))
                 TransferFromWarehouseGridView.Columns["ItemCode"].Visible = false;
 
@@ -153,16 +132,27 @@ namespace WarehouseManagmentSystem.WinForms
             if (TransferFromWarehouseGridView.Columns.Contains("SupplierId"))
                 TransferFromWarehouseGridView.Columns["SupplierId"].Visible = false;
 
-            if (TransferFromWarehouseGridView.Columns.Contains("ProductionDate"))
-                TransferFromWarehouseGridView.Columns["ProductionDate"].Visible = false;
+            if (TransferFromWarehouseGridView.Columns.Contains("ItemCode"))
+                TransferFromWarehouseGridView.Columns["ItemCode"].Visible = false;
+            #endregion
 
-            if (TransferFromWarehouseGridView.Columns.Contains("ExpiryDate"))
-                TransferFromWarehouseGridView.Columns["ExpiryDate"].Visible = false;
+            #region Rename Columns
+            // Rename
+            if (TransferFromWarehouseGridView.Columns.Contains("ItemName"))
+                TransferFromWarehouseGridView.Columns["ItemName"].HeaderText = "Item";
+
+            if (TransferFromWarehouseGridView.Columns.Contains("SupplierName"))
+                TransferFromWarehouseGridView.Columns["SupplierName"].HeaderText = "Supplier";
 
             if (TransferFromWarehouseGridView.Columns.Contains("ItemQuantity"))
-            {
-                TransferFromWarehouseGridView.Columns["ItemQuantity"].ReadOnly = false;
-            }
+                TransferFromWarehouseGridView.Columns["ItemQuantity"].HeaderText = "In Stock";
+
+            if (TransferFromWarehouseGridView.Columns.Contains("ProductionDate"))
+                TransferFromWarehouseGridView.Columns["ProductionDate"].HeaderText = "Prod Date";
+
+            if (TransferFromWarehouseGridView.Columns.Contains("ExpiryDate"))
+                TransferFromWarehouseGridView.Columns["ExpiryDate"].HeaderText = "Exp Date"; 
+            #endregion
         }
 
         private void TransferFromWarehouseGridView_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
@@ -199,7 +189,7 @@ namespace WarehouseManagmentSystem.WinForms
                 TransferToWarehouseGridView.DataSource = null;
                 TransferToWarehouseGridView.DataSource = SelectedItemsList;
 
-                HideTransferToGridViewColumns();
+                EditTransferToGridViewColumns();
 
                 selectedRow.DefaultCellStyle.BackColor = Color.LightGreen;
             }
@@ -208,8 +198,9 @@ namespace WarehouseManagmentSystem.WinForms
         #endregion
 
         #region Transfer To Warehouse GridView
-        private void HideTransferToGridViewColumns()
+        private void EditTransferToGridViewColumns()
         {
+            #region Hide Columns
             if (TransferToWarehouseGridView.Columns.Contains("ItemCode"))
                 TransferToWarehouseGridView.Columns["ItemCode"].Visible = false;
 
@@ -220,13 +211,26 @@ namespace WarehouseManagmentSystem.WinForms
                 TransferToWarehouseGridView.Columns["WarehouseId"].Visible = false;
 
             if (TransferToWarehouseGridView.Columns.Contains("SupplierId"))
-                TransferToWarehouseGridView.Columns["SupplierId"].Visible = false;
+                TransferToWarehouseGridView.Columns["SupplierId"].Visible = false; 
+            #endregion
+
+            #region Rename Columns
+            // Rename
+            if (TransferToWarehouseGridView.Columns.Contains("ItemName"))
+                TransferToWarehouseGridView.Columns["ItemName"].HeaderText = "Item";
+
+            if (TransferToWarehouseGridView.Columns.Contains("SupplierName"))
+                TransferToWarehouseGridView.Columns["SupplierName"].HeaderText = "Supplier";
+
+            if (TransferToWarehouseGridView.Columns.Contains("ItemQuantity"))
+                TransferToWarehouseGridView.Columns["ItemQuantity"].HeaderText = "Transfer Quantity";
 
             if (TransferToWarehouseGridView.Columns.Contains("ProductionDate"))
-                TransferToWarehouseGridView.Columns["ProductionDate"].Visible = false;
+                TransferToWarehouseGridView.Columns["ProductionDate"].HeaderText = "Prod Date";
 
             if (TransferToWarehouseGridView.Columns.Contains("ExpiryDate"))
-                TransferToWarehouseGridView.Columns["ExpiryDate"].Visible = false;
+                TransferToWarehouseGridView.Columns["ExpiryDate"].HeaderText = "Exp Date";
+            #endregion
         }
         private void ResetTransferToWarehouseGridView()
         {
@@ -238,7 +242,7 @@ namespace WarehouseManagmentSystem.WinForms
             {
                 column.ReadOnly = column.Name != "ItemQuantity";
             }
-            HideTransferToGridViewColumns();
+            EditTransferToGridViewColumns();
         }
 
         private void TransferToWarehouseGridView_CellBeginEdit(object sender, DataGridViewCellCancelEventArgs e)
@@ -331,7 +335,7 @@ namespace WarehouseManagmentSystem.WinForms
                             // Refresh grid
                             TransferToWarehouseGridView.DataSource = null;
                             TransferToWarehouseGridView.DataSource = SelectedItemsList;
-                            HideTransferToGridViewColumns();
+                            EditTransferToGridViewColumns();
                         }
                     }
                 }
@@ -375,7 +379,7 @@ namespace WarehouseManagmentSystem.WinForms
                         // Refresh selection grid
                         TransferToWarehouseGridView.DataSource = null;
                         TransferToWarehouseGridView.DataSource = SelectedItemsList;
-                        HideTransferToGridViewColumns();
+                        EditTransferToGridViewColumns();
                     }
                 }
             }
@@ -388,11 +392,10 @@ namespace WarehouseManagmentSystem.WinForms
         {
             SelectedItemsList.Clear();
             AvailableItemsAtWarehouseList.Clear();
-            //TransferSupplierComboBox.SelectedIndex = -1;
             TransferFromWarehouseComboBox.SelectedIndex = -1;
             TransferToWarehouseComboBox.SelectedIndex = -1;
             TransferToWarehouseComboBox.Enabled = false;
-            TransferDateDatePicker.Value = DateTime.Now;
+            TransferDateDatePicker.Text = "";
 
             TransferFromWarehouseGridView.DataSource = null;
             TransferFromWarehouseGridView.Refresh();
@@ -526,24 +529,39 @@ namespace WarehouseManagmentSystem.WinForms
 
         private async void TransferCreateVoucherButton_ClickAsync(object sender, EventArgs e)
         {
-            if (!IsValidTransfer())
-                return;
-            using var context = new WarehouseDbContext();
-             var transaction = await context.Database.BeginTransactionAsync();
-            try
+            if (IsValidTransfer())
             {
-                await UpdateQuantitiesAsync();
-                await AddToTransferVoucherAndDetailsTable();
-                await transaction.CommitAsync();
+                using var context = new WarehouseDbContext();
+                var transaction = await context.Database.BeginTransactionAsync();
+                string message = $"Confirm Transfer Items\n\n" +
+                              $"From Warehouse: {TransferFromWarehouseComboBox.Text}\n" +
+                              $"To Warehouse: {TransferToWarehouseComboBox.Text}\n" +
+                              $"Transfer Date: {TransferDateDatePicker.Text}\n" +
+                              $"Transfer Items:\n{string.Join("\n", SelectedItemsList)}";
+
+                var result = MessageBox.Show(message, "Confirm Transfer",
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+                if (result == DialogResult.Yes)
+                {
+                    try
+                    {
+                        await UpdateQuantitiesAsync();
+                        await AddToTransferVoucherAndDetailsTable();
+                        await transaction.CommitAsync();
+                        MessageBox.Show("Voucher created successfully!", "Success",
+                                MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    catch
+                    {
+                        await transaction.RollbackAsync();
+                        MessageBox.Show("Voucher Failed", "Fail",
+                                MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+
+                    ResetTransferForm();
+                }
             }
-            catch
-            {
-                await transaction.RollbackAsync();
-                throw;
-            }
-            MessageBox.Show("Voucher created successfully!", "Success",
-                MessageBoxButtons.OK, MessageBoxIcon.Information);
-            ResetTransferForm();
         }
     }
 }

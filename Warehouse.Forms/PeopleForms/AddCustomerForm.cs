@@ -14,13 +14,44 @@ namespace WarehouseManagmentSystem.WinForms
         public AddCustomerForm()
         {
             InitializeComponent();
-            LoadPeopleToGridView();
+            ApplyAnchorsAndDocking();
         }
         #endregion
 
         #region Methods
 
+        #region UI 
+        private void ApplyAnchorsAndDocking()
+        {
+            // TextBoxes should stretch horizontally
+            UserNameTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            UserMobileTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            UserLandlineTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            UserFaxTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            UserEmailTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            UserWebsiteTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+
+            // Label should stretch horizontally
+            UserNameLabel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            UserMobileLabel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            UserLandlineLabel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            UserFaxLabel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            UserEmailLabel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            UserWebsiteLabel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+
+            // Button should stay at the bottom right
+            AddUserButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+
+            // DataGridView should expand to fill the bottom area
+            CustomerDataGridView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+        }
+        #endregion
+
         #region Load and Reset Data
+        private void AddCustomerForm_Load(object sender, EventArgs e)
+        {
+            LoadPeopleToGridView();
+        }
         private async void LoadPeopleToGridView()
         {
             using var context = new WarehouseDbContext();
@@ -43,31 +74,50 @@ namespace WarehouseManagmentSystem.WinForms
         #region Add Customer Button Even handler
         private async void AddUserButton_ClickAsync(object sender, EventArgs e)
         {
+
             if (IsValidForm())
             {
-                try
+                // Create confirmation message
+                string message = $"Confirm Adding Customer\n\n" +
+                               $"Name:            {UserNameTextBox.Text}\n" +
+                               $"Landline number: {UserLandlineTextBox.Text}\n" +
+                               $"Fax number:      {UserFaxTextBox.Text}\n" +
+                               $"Mobile number:   {UserMobileTextBox.Text}\n" +
+                               $"Email number:    {UserEmailTextBox.Text}\n" +
+                               $"Website number:  {UserWebsiteTextBox.Text}\n";
+
+                var result = MessageBox.Show(message, "Confirm Adding",
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+                if (result == DialogResult.Yes)
                 {
-                    using var context = new WarehouseDbContext();
-                    var personRepository = new PersonRepository(context);
-                    Customer customer = new Customer
+                    try
                     {
-                        Name = UserNameTextBox.Text,
-                        Landline = UserLandlineTextBox.Text,
-                        Fax = UserFaxTextBox.Text,
-                        Mobile = UserMobileTextBox.Text,
-                        Email = UserEmailTextBox.Text,
-                        Website = UserWebsiteTextBox.Text,
-                    };
-                    await personRepository.AddAsync(customer);
-                    ResetFormEnteredData();
-                    LoadPeopleToGridView();
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Error adding Person: {ex.Message}", "Error",
-                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        using var context = new WarehouseDbContext();
+                        var personRepository = new PersonRepository(context);
+                        Customer customer = new Customer
+                        {
+                            Name = UserNameTextBox.Text,
+                            Landline = UserLandlineTextBox.Text,
+                            Fax = UserFaxTextBox.Text,
+                            Mobile = UserMobileTextBox.Text,
+                            Email = UserEmailTextBox.Text,
+                            Website = UserWebsiteTextBox.Text,
+                        };
+                        await personRepository.AddAsync(customer);
+                        ResetFormEnteredData();
+                        LoadPeopleToGridView();
+                        MessageBox.Show("Customer Added successfully!", "Success",
+                            MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error adding Customer: {ex.Message}", "Error",
+                            MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
                 }
             }
+
         }
         #endregion
 

@@ -38,15 +38,15 @@
             // ReportForWarehousesCheckBoxList
             // 
             ReportForWarehousesCheckBoxList.FormattingEnabled = true;
-            ReportForWarehousesCheckBoxList.Location = new Point(189, 626);
+            ReportForWarehousesCheckBoxList.Location = new Point(199, 727);
             ReportForWarehousesCheckBoxList.Name = "ReportForWarehousesCheckBoxList";
-            ReportForWarehousesCheckBoxList.Size = new Size(308, 180);
+            ReportForWarehousesCheckBoxList.Size = new Size(308, 224);
             ReportForWarehousesCheckBoxList.TabIndex = 61;
             ReportForWarehousesCheckBoxList.ItemCheck += ReportForWarehousesCheckBoxList_ItemCheck;
             // 
             // ActionButton
             // 
-            ActionButton.Location = new Point(632, 709);
+            ActionButton.Location = new Point(642, 810);
             ActionButton.Name = "ActionButton";
             ActionButton.Size = new Size(271, 56);
             ActionButton.TabIndex = 59;
@@ -56,13 +56,17 @@
             // 
             // ReportViewGridView
             // 
+            ReportViewGridView.AllowUserToAddRows = false;
+            ReportViewGridView.AllowUserToDeleteRows = false;
+            ReportViewGridView.AllowUserToOrderColumns = true;
             ReportViewGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             ReportViewGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             ReportViewGridView.Dock = DockStyle.Top;
             ReportViewGridView.Location = new Point(0, 0);
             ReportViewGridView.Name = "ReportViewGridView";
+            ReportViewGridView.ReadOnly = true;
             ReportViewGridView.RowHeadersWidth = 51;
-            ReportViewGridView.Size = new Size(2329, 555);
+            ReportViewGridView.Size = new Size(2329, 651);
             ReportViewGridView.TabIndex = 57;
             ReportViewGridView.CellFormatting += ReportViewGridView_CellFormatting;
             ReportViewGridView.CellPainting += ReportViewGridView_CellPainting;
@@ -72,7 +76,7 @@
             // ReportForWarehousesLabel
             // 
             ReportForWarehousesLabel.AutoSize = true;
-            ReportForWarehousesLabel.Location = new Point(12, 633);
+            ReportForWarehousesLabel.Location = new Point(22, 734);
             ReportForWarehousesLabel.Name = "ReportForWarehousesLabel";
             ReportForWarehousesLabel.Size = new Size(151, 20);
             ReportForWarehousesLabel.TabIndex = 65;
@@ -88,7 +92,7 @@
             Controls.Add(ActionButton);
             Controls.Add(ReportViewGridView);
             Name = "ItemAtWarehouseDaysTillExpirationReportForm";
-            Text = "ItemAtWarehouseDaysTillExpirationReport";
+            Text = "Expiration Date Report";
             Load += ItemAtWarehouseDaysTillExpirationReportForm_Load;
             ((System.ComponentModel.ISupportInitialize)ReportViewGridView).EndInit();
             ResumeLayout(false);
