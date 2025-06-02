@@ -1,4 +1,6 @@
-﻿using System.Text.RegularExpressions;
+﻿using Azure;
+using System.Text.RegularExpressions;
+using System.Windows.Forms;
 using WarehouseManagementSystem.Data.Context;
 using WarehouseManagementSystem.Data.Repositories;
 using WarehouseManagementSystem.Domain.Models;
@@ -14,13 +16,44 @@ namespace WarehouseManagmentSystem.WinForms
         public AddCustomerForm()
         {
             InitializeComponent();
-            LoadPeopleToGridView();
+            ApplyAnchorsAndDocking();
         }
         #endregion
 
         #region Methods
 
+        #region UI 
+        private void ApplyAnchorsAndDocking()
+        {
+            // TextBoxes should stretch horizontally
+            UserNameTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            UserMobileTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            UserLandlineTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            UserFaxTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            UserEmailTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            UserWebsiteTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+
+            // Label should stretch horizontally
+            UserNameLabel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            UserMobileLabel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            UserLandlineLabel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            UserFaxLabel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            UserEmailLabel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            UserWebsiteLabel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+
+            // Button should stay at the bottom right
+            AddUserButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+
+            // DataGridView should expand to fill the bottom area
+            CustomerDataGridView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+        }
+        #endregion
+
         #region Load and Reset Data
+        private void AddCustomerForm_Load(object sender, EventArgs e)
+        {
+            LoadPeopleToGridView();
+        }
         private async void LoadPeopleToGridView()
         {
             using var context = new WarehouseDbContext();

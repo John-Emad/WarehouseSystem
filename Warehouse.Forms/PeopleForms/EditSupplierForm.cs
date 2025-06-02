@@ -16,7 +16,6 @@ namespace WarehouseManagmentSystem.WinForms.PeopleForms
         {
             SelectedSupplier = new Supplier();
             InitializeComponent();
-            LoadSuppliersToGridView();
             UnenableControlsTillSelecting();
         }
         #endregion
@@ -56,6 +55,10 @@ namespace WarehouseManagmentSystem.WinForms.PeopleForms
             UserMobileTextBox.Clear();
             UserEmailTextBox.Clear();
             UserWebsiteTextBox.Clear();
+        }
+        private void EditSupplierForm_Load(object sender, EventArgs e)
+        {
+            LoadSuppliersToGridView();
         }
         #endregion
 
@@ -214,5 +217,8 @@ namespace WarehouseManagmentSystem.WinForms.PeopleForms
             }
         }
         #endregion
+
+
+
     }
 }
