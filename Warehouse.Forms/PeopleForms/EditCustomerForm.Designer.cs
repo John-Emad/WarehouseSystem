@@ -234,6 +234,7 @@
             StartPosition = FormStartPosition.CenterParent;
             Text = "Edit Customer";
             WindowState = FormWindowState.Maximized;
+            Load += EditCustomerForm_Load;
             ((System.ComponentModel.ISupportInitialize)CustomerDataGridView).EndInit();
             tableLayoutPanel1.ResumeLayout(false);
             tableLayoutPanel1.PerformLayout();

@@ -1,6 +1,4 @@
-﻿using Azure;
-using System.Text.RegularExpressions;
-using System.Windows.Forms;
+﻿using System.Text.RegularExpressions;
 using WarehouseManagementSystem.Data.Context;
 using WarehouseManagementSystem.Data.Repositories;
 using WarehouseManagementSystem.Domain.Models;
@@ -76,31 +74,49 @@ namespace WarehouseManagmentSystem.WinForms
         #region Add Customer Button Even handler
         private async void AddUserButton_ClickAsync(object sender, EventArgs e)
         {
+
             if (IsValidForm())
             {
-                try
+                // Create confirmation message
+                string message = $"Confirm Adding Customer\n\n" +
+                               $"Name:            {UserNameTextBox.Text}\n" +
+                               $"Landline number: {UserLandlineTextBox.Text}\n" +
+                               $"Fax number:      {UserFaxTextBox.Text}\n" +
+                               $"Mobile number:   {UserMobileTextBox.Text}\n" +
+                               $"Email number:    {UserEmailTextBox.Text}\n" +
+                               $"Website number:  {UserWebsiteTextBox.Text}\n";
+
+                var result = MessageBox.Show(message, "Confirm Adding",
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+                if (result == DialogResult.Yes)
                 {
-                    using var context = new WarehouseDbContext();
-                    var personRepository = new PersonRepository(context);
-                    Customer customer = new Customer
+                    try
                     {
-                        Name = UserNameTextBox.Text,
-                        Landline = UserLandlineTextBox.Text,
-                        Fax = UserFaxTextBox.Text,
-                        Mobile = UserMobileTextBox.Text,
-                        Email = UserEmailTextBox.Text,
-                        Website = UserWebsiteTextBox.Text,
-                    };
-                    await personRepository.AddAsync(customer);
-                    ResetFormEnteredData();
-                    LoadPeopleToGridView();
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Error adding Person: {ex.Message}", "Error",
-                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        using var context = new WarehouseDbContext();
+                        var personRepository = new PersonRepository(context);
+                        Customer customer = new Customer
+                        {
+                            Name = UserNameTextBox.Text,
+                            Landline = UserLandlineTextBox.Text,
+                            Fax = UserFaxTextBox.Text,
+                            Mobile = UserMobileTextBox.Text,
+                            Email = UserEmailTextBox.Text,
+                            Website = UserWebsiteTextBox.Text,
+                        };
+                        await personRepository.AddAsync(customer);
+                        ResetFormEnteredData();
+                        LoadPeopleToGridView();
+                        MessageBox.Show($"Customer added successfully!");
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error adding Customer: {ex.Message}", "Error",
+                            MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
                 }
             }
+
         }
         #endregion
 

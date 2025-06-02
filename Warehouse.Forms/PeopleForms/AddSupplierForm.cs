@@ -75,27 +75,43 @@ namespace WarehouseManagmentSystem.WinForms.PeopleForms
         {
             if (IsValidForm())
             {
-                try
+                // Create confirmation message
+                string message = $"Confirm Adding Supplier\n\n" +
+                               $"Name:            {UserNameTextBox.Text}\n" +
+                               $"Landline number: {UserLandlineTextBox.Text}\n" +
+                               $"Fax number:      {UserFaxTextBox.Text}\n" +
+                               $"Mobile number:   {UserMobileTextBox.Text}\n" +
+                               $"Email number:    {UserEmailTextBox.Text}\n" +
+                               $"Website number:  {UserWebsiteTextBox.Text}\n";
+
+                var result = MessageBox.Show(message, "Confirm Adding",
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+                if (result == DialogResult.Yes)
                 {
-                    using var context = new WarehouseDbContext();
-                    var personRepository = new PersonRepository(context);
-                    Supplier supplier = new Supplier
+                    try
                     {
-                        Name = UserNameTextBox.Text,
-                        Landline = UserLandlineTextBox.Text,
-                        Fax = UserFaxTextBox.Text,
-                        Mobile = UserMobileTextBox.Text,
-                        Email = UserEmailTextBox.Text,
-                        Website = UserWebsiteTextBox.Text,
-                    };
-                    await personRepository.AddAsync(supplier);
-                    ResetFormEnteredData();
-                    LoadPeopleToGridView();
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Error adding Person: {ex.Message}", "Error",
-                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        using var context = new WarehouseDbContext();
+                        var personRepository = new PersonRepository(context);
+                        Supplier supplier = new Supplier
+                        {
+                            Name = UserNameTextBox.Text,
+                            Landline = UserLandlineTextBox.Text,
+                            Fax = UserFaxTextBox.Text,
+                            Mobile = UserMobileTextBox.Text,
+                            Email = UserEmailTextBox.Text,
+                            Website = UserWebsiteTextBox.Text,
+                        };
+                        await personRepository.AddAsync(supplier);
+                        ResetFormEnteredData();
+                        LoadPeopleToGridView();
+                        MessageBox.Show($"Supplier added successfully!");
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error adding Supplier: {ex.Message}", "Error",
+                            MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
                 }
             }
         }
