@@ -89,6 +89,13 @@ namespace WarehouseManagmentSystem.WinForms
                 i.ExpiryDate,
             }).ToList();
             ReceiptVoucherItemsGridView.DataSource = viewList;
+
+            if (ReceiptVoucherItemsGridView.Columns.Contains("ProductionDate"))
+                ReceiptVoucherItemsGridView.Columns["ProductionDate"].HeaderText = "Prod Date";
+
+            if (ReceiptVoucherItemsGridView.Columns.Contains("ExpiryDate"))
+                ReceiptVoucherItemsGridView.Columns["ExpiryDate"].HeaderText = "Exp Date";
+
         }
         #endregion
 
@@ -133,28 +140,44 @@ namespace WarehouseManagmentSystem.WinForms
         private async Task AddToReceiptVoucherAndDetailsTables()
         {
             using var context = new WarehouseDbContext();
-            var _receiptVoucherRepository = new ReceiptVoucherRepository(context);
-            var _receiptVoucherDetailsRepository = new ReceiptVoucherDetailsRepository(context);
-            var receiptVoucher = new ReceiptVoucher
-            {
-                Date = DateOnly.FromDateTime(ReceiptVoucherReceiptDate.Value),
-                SupplierId = (int)ReceiptVoucherSupplierComboBox.SelectedValue,
-                WarehouseId = (int)ReceiptVoucherWarehouseComboBox.SelectedValue
-            };
-            await _receiptVoucherRepository.AddAsync(receiptVoucher);
+            await using var transaction = await context.Database.BeginTransactionAsync();
 
-            foreach (var dto in InventoryItemViewDTOList)
+            try
             {
-                var detail = new ReceiptVoucherDetail
+                // Create and add the main receipt voucher
+                var _receiptVoucherRepository = new ReceiptVoucherRepository(context);
+                var receiptVoucher = new ReceiptVoucher
                 {
-                    VoucherId = receiptVoucher.Id,
-                    ItemCode = dto.ItemCode,
-                    Quantity = dto.Quantity,
-                    ProductionDate = DateOnly.FromDateTime(dto.ProductionDate),
-                    ExpiryDate = DateOnly.FromDateTime(dto.ExpiryDate)
+                    Date = DateOnly.FromDateTime(ReceiptVoucherReceiptDate.Value),
+                    SupplierId = (int)ReceiptVoucherSupplierComboBox.SelectedValue,
+                    WarehouseId = (int)ReceiptVoucherWarehouseComboBox.SelectedValue
                 };
+                await _receiptVoucherRepository.AddAsync(receiptVoucher);
 
-                await _receiptVoucherDetailsRepository.AddAsync(detail);
+                // Add all voucher details
+                var _receiptVoucherDetailsRepository = new ReceiptVoucherDetailsRepository(context);
+                foreach (var dto in InventoryItemViewDTOList)
+                {
+                    var detail = new ReceiptVoucherDetail
+                    {
+                        VoucherId = receiptVoucher.Id,
+                        ItemCode = dto.ItemCode,
+                        Quantity = dto.Quantity,
+                        ProductionDate = DateOnly.FromDateTime(dto.ProductionDate),
+                        ExpiryDate = DateOnly.FromDateTime(dto.ExpiryDate)
+                    };
+                    await _receiptVoucherDetailsRepository.AddAsync(detail);
+                }
+
+                // Commit transaction if everything succeeds
+                await transaction.CommitAsync();
+
+            }
+            catch (Exception ex)
+            {
+                // Rollback transaction if any error occurs
+                await transaction.RollbackAsync();
+                throw;
             }
         }
         #endregion
@@ -239,7 +262,7 @@ namespace WarehouseManagmentSystem.WinForms
         #region Comboboxes and Dates Event Handler
         private void ReceiptVoucherWarehouseComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (isFormLoading) return; 
+            if (isFormLoading) return;
 
             if (ReceiptVoucherWarehouseComboBox.SelectedIndex > 0)
             {
@@ -267,7 +290,7 @@ namespace WarehouseManagmentSystem.WinForms
 
         private void ReceiptVoucherReceiptDate_ValueChanged(object sender, EventArgs e)
         {
-            if (isFormLoading) return; 
+            if (isFormLoading) return;
             UserChosenViewReceiptDateLabel.Text = ReceiptVoucherReceiptDate.Text;
         }
         #endregion

@@ -21,6 +21,7 @@ namespace WarehouseManagementSystem.Domain.DTOs
         public string RelatedPerson { get; set; } // Supplier/Customer name
 
         public bool IsSummaryRow {  get; set; }
+        public bool IsWarehouseSummary { get; set; }
 
     }
 }

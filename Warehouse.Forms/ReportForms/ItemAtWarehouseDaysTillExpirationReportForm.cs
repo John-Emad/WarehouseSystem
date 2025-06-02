@@ -54,23 +54,6 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
         #endregion
 
         #region Event Handlers (Checkbox, ComboBox, CheckboxList)
-        //private void ChooseDateCheckBox_ChechStateChanged(object sender, EventArgs e)
-        //{
-        //    if (ChooseDateInsteadCheckBox.Checked)
-        //    {
-        //        PeriodDaysLabel.Visible = false;
-        //        PeriodDaysTextBox.Visible = false;
-        //        FromDateLabel.Visible = true;
-        //        ReportStartDateDatePicker.Visible = true;
-        //    }
-        //    else
-        //    {
-        //        PeriodDaysLabel.Visible = true;
-        //        PeriodDaysTextBox.Visible = true;
-        //        FromDateLabel.Visible = false;
-        //        ReportStartDateDatePicker.Visible = false;
-        //    }
-        //}
         private void ReportForWarehousesCheckBoxList_ItemCheck(object sender, ItemCheckEventArgs e)
         {
             // Delay the update until after the check state is changed
@@ -97,7 +80,7 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
             var items = await _customizedQueriesRepository.GetAllAvailableItemAtWarehouseExpiration(SelectedWarehousesIDs);
             ReportViewGridView.DataSource = ConfigureReportGridView(items);
 
-            HideUnnecessaryWarehouseDataColumns();
+            EditWarehouseGridViewDataColumns();
             MessageBox.Show("Searching Done");
         }
 
@@ -161,14 +144,10 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
         //}
         #endregion
 
-        #region Hide Columns
-        private void HideUnnecessaryWarehouseDataColumns()
+        #region Edit Columns
+        private void EditWarehouseGridViewDataColumns()
         {
-            foreach (DataGridViewColumn column in ReportViewGridView.Columns)
-            {
-                column.ReadOnly = true;
-            }
-
+            #region Hide
             if (ReportViewGridView.Columns.Contains("ItemCode"))
                 ReportViewGridView.Columns["ItemCode"].Visible = false;
 
@@ -191,6 +170,34 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
 
             if (ReportViewGridView.Columns.Contains("IsWarehouseSummary"))
                 ReportViewGridView.Columns["IsWarehouseSummary"].Visible = false;
+            #endregion
+
+            #region Rename
+            if (ReportViewGridView.Columns.Contains("SupplierName"))
+                ReportViewGridView.Columns["SupplierName"].HeaderText = "Supplier";
+
+            if (ReportViewGridView.Columns.Contains("ItemQuantity"))
+                ReportViewGridView.Columns["ItemQuantity"].HeaderText = "Transfer Quantity";
+
+            if (ReportViewGridView.Columns.Contains("ProductionDate"))
+                ReportViewGridView.Columns["ProductionDate"].HeaderText = "Prod Date";
+
+            if (ReportViewGridView.Columns.Contains("ExpiryDate"))
+                ReportViewGridView.Columns["ExpiryDate"].HeaderText = "Exp Date";
+
+            if (ReportViewGridView.Columns.Contains("Quantity"))
+                ReportViewGridView.Columns["Quantity"].HeaderText = "Supplied Quantity";
+
+            if (ReportViewGridView.Columns.Contains("AtWareHouseSinceDate"))
+                ReportViewGridView.Columns["AtWareHouseSinceDate"].HeaderText = "Entered warehouse at";
+
+
+            if (ReportViewGridView.Columns.Contains("RemainingDays"))
+                ReportViewGridView.Columns["RemainingDays"].HeaderText = "Remaining till expiration (Days)";
+
+            if (ReportViewGridView.Columns.Contains("EnteredBy"))
+                ReportViewGridView.Columns["EnteredBy"].HeaderText = "Entering method";
+            #endregion
         }
         #endregion
 
@@ -361,8 +368,6 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
 
             return displayList;
         }
-
-
         #endregion
 
     }

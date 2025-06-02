@@ -239,24 +239,27 @@ namespace WarehouseManagementSystem.Data.Repositories
         #endregion
 
 
+        #region Item / warehouse
         public async Task<List<ItemMovementReportDTO>> GetItemDetailsWithinWarehouses(string itemCode, List<int> warehouseIds)
         {
             using var context = new WarehouseDbContext();
 
-            // Receipts query (items coming INTO warehouses)
+            // Receipts (items coming INTO warehouses)
             #region Receipt Query
             var receiptsQuery =
                 from rv in context.ReceiptVouchers
                 join rvd in context.ReceiptVoucherDetails on rv.Id equals rvd.VoucherId
-                join ii in context.InventoryItems on new { rvd.ItemCode, rv.WarehouseId } equals new { ii.ItemCode, ii.WarehouseId }
+                join ii in context.InventoryItems
+                    on new { rvd.ItemCode, rv.WarehouseId, rvd.ProductionDate, rvd.ExpiryDate }
+                    equals new { ii.ItemCode, ii.WarehouseId, ii.ProductionDate, ii.ExpiryDate }
                 where rvd.ItemCode == itemCode && warehouseIds.Contains(rv.WarehouseId)
                 join supplier in context.Suppliers on rv.SupplierId equals supplier.Id
                 select new ItemMovementReportDTO
                 {
-                    ItemCode = itemCode,
+                    ItemCode = rvd.ItemCode,
                     ItemName = rvd.Item.Name,
                     Warehouse = ii.Warehouse.Name,
-                    CurrentQuantity = ii.Quantity, // Directly from joined inventory
+                    CurrentQuantity = ii.Quantity,
                     ProductionDate = ii.ProductionDate,
                     ExpiryDate = ii.ExpiryDate,
                     MovementType = "Receipt",
@@ -270,20 +273,20 @@ namespace WarehouseManagementSystem.Data.Repositories
                 };
             #endregion
 
-            // Outgoing Transfers (items moving FROM selected warehouses)
-            #region outgoing transfer Query
+            // Outgoing Transfers (items FROM selected warehouses)
+            #region Outgoing Transfer Query
             var outgoingTransfersQuery =
                 from tv in context.TransferVouchers
                 join tvd in context.TransferVoucherDetails on tv.Id equals tvd.VoucherId
-                join ii in context.InventoryItems on
-                    new { ItemCode = tvd.ItemCode, WarehouseId = tv.FromWarehouseId } equals
-                    new { ItemCode = ii.ItemCode, WarehouseId = ii.WarehouseId }
+                join ii in context.InventoryItems
+                    on new { tvd.ItemCode, WarehouseId = tv.FromWarehouseId, tvd.ProductionDate, tvd.ExpiryDate }
+                    equals new { ii.ItemCode, ii.WarehouseId, ii.ProductionDate, ii.ExpiryDate }
                 where tvd.ItemCode == itemCode && warehouseIds.Contains(tv.FromWarehouseId)
                 join fromWh in context.Warehouses on tv.FromWarehouseId equals fromWh.Id
                 join toWh in context.Warehouses on tv.ToWarehouseId equals toWh.Id
                 select new ItemMovementReportDTO
                 {
-                    ItemCode = itemCode,
+                    ItemCode = tvd.ItemCode,
                     ItemName = tvd.Item.Name,
                     Warehouse = ii.Warehouse.Name,
                     CurrentQuantity = ii.Quantity,
@@ -300,47 +303,49 @@ namespace WarehouseManagementSystem.Data.Repositories
                 };
             #endregion
 
-            // Incoming Transfers (items moving TO selected warehouses)
-            #region Incoming transfer Query
+            // Incoming Transfers (items TO selected warehouses)
+            #region Incoming Transfer Query
             var incomingTransfersQuery =
-                        from tv in context.TransferVouchers
-                        join tvd in context.TransferVoucherDetails on tv.Id equals tvd.VoucherId
-                        join ii in context.InventoryItems on
-                            new { ItemCode = tvd.ItemCode, WarehouseId = tv.ToWarehouseId } equals
-                            new { ItemCode = ii.ItemCode, WarehouseId = ii.WarehouseId }
-                        where tvd.ItemCode == itemCode && warehouseIds.Contains(tv.ToWarehouseId)
-                        join fromWh in context.Warehouses on tv.FromWarehouseId equals fromWh.Id
-                        join toWh in context.Warehouses on tv.ToWarehouseId equals toWh.Id
-                        select new ItemMovementReportDTO
-                        {
-                            ItemCode = itemCode,
-                            ItemName = tvd.Item.Name,
-                            Warehouse = ii.Warehouse.Name,
-                            CurrentQuantity = ii.Quantity,
-                            ProductionDate = ii.ProductionDate,
-                            ExpiryDate = ii.ExpiryDate,
-                            MovementType = "Transfer In",
-                            Date = tv.Date,
-                            FromWarehouseId = tv.FromWarehouseId,
-                            FromWarehouseName = fromWh.Name,
-                            ToWarehouseId = tv.ToWarehouseId,
-                            ToWarehouseName = toWh.Name,
-                            RelatedPerson = tvd.Supplier.Name,
-                            Quantity = tvd.Quantity,
-                        };
+                from tv in context.TransferVouchers
+                join tvd in context.TransferVoucherDetails on tv.Id equals tvd.VoucherId
+                join ii in context.InventoryItems
+                    on new { tvd.ItemCode, WarehouseId = tv.ToWarehouseId, tvd.ProductionDate, tvd.ExpiryDate }
+                    equals new { ii.ItemCode, ii.WarehouseId, ii.ProductionDate, ii.ExpiryDate }
+                where tvd.ItemCode == itemCode && warehouseIds.Contains(tv.ToWarehouseId)
+                join fromWh in context.Warehouses on tv.FromWarehouseId equals fromWh.Id
+                join toWh in context.Warehouses on tv.ToWarehouseId equals toWh.Id
+                select new ItemMovementReportDTO
+                {
+                    ItemCode = tvd.ItemCode,
+                    ItemName = tvd.Item.Name,
+                    Warehouse = ii.Warehouse.Name,
+                    CurrentQuantity = ii.Quantity,
+                    ProductionDate = ii.ProductionDate,
+                    ExpiryDate = ii.ExpiryDate,
+                    MovementType = "Transfer In",
+                    Date = tv.Date,
+                    FromWarehouseId = tv.FromWarehouseId,
+                    FromWarehouseName = fromWh.Name,
+                    ToWarehouseId = tv.ToWarehouseId,
+                    ToWarehouseName = toWh.Name,
+                    RelatedPerson = tvd.Supplier.Name,
+                    Quantity = tvd.Quantity,
+                };
             #endregion
 
-            // Issues query (items leaving warehouses)
+            // Issues (items leaving warehouses)
             #region Issue Query
             var issuesQuery =
                 from iv in context.IssueVouchers
                 join ivd in context.IssueVoucherDetails on iv.Id equals ivd.VoucherId
-                join ii in context.InventoryItems on new { ivd.ItemCode, iv.WarehouseId } equals new { ii.ItemCode, ii.WarehouseId }
+                join ii in context.InventoryItems
+                    on new { ivd.ItemCode, iv.WarehouseId, ivd.ProductionDate, ivd.ExpiryDate }
+                    equals new { ii.ItemCode, ii.WarehouseId, ii.ProductionDate, ii.ExpiryDate }
                 where ivd.ItemCode == itemCode && warehouseIds.Contains(iv.WarehouseId)
                 join customer in context.Customers on iv.CustomerId equals customer.Id
                 select new ItemMovementReportDTO
                 {
-                    ItemCode = itemCode,
+                    ItemCode = ivd.ItemCode,
                     ItemName = ivd.Item.Name,
                     Warehouse = ii.Warehouse.Name,
                     CurrentQuantity = ii.Quantity,
@@ -362,13 +367,13 @@ namespace WarehouseManagementSystem.Data.Repositories
             var incomingTransfers = await incomingTransfersQuery.ToListAsync();
             var issues = await issuesQuery.ToListAsync();
 
-
             var results = receipts
                 .Concat(outgoingTransfers)
                 .Concat(incomingTransfers)
                 .Concat(issues)
                 .OrderBy(x => x.Date)
                 .ToList();
+
             return results;
         }
 
@@ -518,6 +523,9 @@ namespace WarehouseManagementSystem.Data.Repositories
             return results;
         }
 
+        #endregion
+
+
 
         public async Task<List<ItemMovementReportDTO>> GetAllItemDetailsWithinWarehouses(List<int> warehouseIds)
         {
@@ -527,7 +535,21 @@ namespace WarehouseManagementSystem.Data.Repositories
             var receiptsQuery =
                 from rv in context.ReceiptVouchers
                 join rvd in context.ReceiptVoucherDetails on rv.Id equals rvd.VoucherId
-                join ii in context.InventoryItems on new { rvd.ItemCode, rv.WarehouseId } equals new { ii.ItemCode, ii.WarehouseId }
+                join ii in context.InventoryItems
+                    on new
+                    {
+                        rvd.ItemCode,
+                        WarehouseId = rv.WarehouseId,
+                        rvd.ProductionDate,
+                        rvd.ExpiryDate
+                    }
+                    equals new
+                    {
+                        ii.ItemCode,
+                        ii.WarehouseId,
+                        ii.ProductionDate,
+                        ii.ExpiryDate
+                    }
                 where warehouseIds.Contains(rv.WarehouseId)
                 join supplier in context.Suppliers on rv.SupplierId equals supplier.Id
                 select new ItemMovementReportDTO
@@ -535,7 +557,7 @@ namespace WarehouseManagementSystem.Data.Repositories
                     ItemCode = rvd.ItemCode,
                     ItemName = rvd.Item.Name,
                     Warehouse = ii.Warehouse.Name,
-                    CurrentQuantity = ii.Quantity, // Directly from joined inventory
+                    CurrentQuantity = ii.Quantity, // Correct quantity for the exact batch
                     ProductionDate = ii.ProductionDate,
                     ExpiryDate = ii.ExpiryDate,
                     MovementType = "Receipt",
@@ -549,14 +571,27 @@ namespace WarehouseManagementSystem.Data.Repositories
                 };
             #endregion
 
+
             // Outgoing Transfers (items moving FROM selected warehouses)
             #region Outgoing Transfer Query
             var outgoingTransfersQuery =
                 from tv in context.TransferVouchers
                 join tvd in context.TransferVoucherDetails on tv.Id equals tvd.VoucherId
-                join ii in context.InventoryItems on
-                    new { ItemCode = tvd.ItemCode, WarehouseId = tv.FromWarehouseId } equals
-                    new { ItemCode = ii.ItemCode, WarehouseId = ii.WarehouseId }
+                join ii in context.InventoryItems
+                    on new
+                    {
+                        tvd.ItemCode,
+                        WarehouseId = tv.FromWarehouseId,
+                        tvd.ProductionDate,
+                        tvd.ExpiryDate
+                    }
+                    equals new
+                    {
+                        ii.ItemCode,
+                        ii.WarehouseId,
+                        ii.ProductionDate,
+                        ii.ExpiryDate
+                    }
                 where warehouseIds.Contains(tv.FromWarehouseId)
                 join fromWh in context.Warehouses on tv.FromWarehouseId equals fromWh.Id
                 join toWh in context.Warehouses on tv.ToWarehouseId equals toWh.Id
@@ -579,35 +614,48 @@ namespace WarehouseManagementSystem.Data.Repositories
                 };
             #endregion
 
+
             // Incoming Transfers (items moving TO selected warehouses)
             #region Incoming Transfer Query
             var incomingTransfersQuery =
-                        from tv in context.TransferVouchers
-                        join tvd in context.TransferVoucherDetails on tv.Id equals tvd.VoucherId
-                        join ii in context.InventoryItems on
-                            new { ItemCode = tvd.ItemCode, WarehouseId = tv.ToWarehouseId } equals
-                            new { ItemCode = ii.ItemCode, WarehouseId = ii.WarehouseId }
-                        where warehouseIds.Contains(tv.ToWarehouseId)
+                from tv in context.TransferVouchers
+                join tvd in context.TransferVoucherDetails on tv.Id equals tvd.VoucherId
+                join ii in context.InventoryItems
+                    on new
+                    {
+                        tvd.ItemCode,
+                        WarehouseId = tv.ToWarehouseId,
+                        tvd.ProductionDate,
+                        tvd.ExpiryDate
 
-                        join fromWh in context.Warehouses on tv.FromWarehouseId equals fromWh.Id
-                        join toWh in context.Warehouses on tv.ToWarehouseId equals toWh.Id
-                        select new ItemMovementReportDTO
-                        {
-                            ItemCode = tvd.ItemCode,
-                            ItemName = tvd.Item.Name,
-                            Warehouse = ii.Warehouse.Name,
-                            CurrentQuantity = ii.Quantity,
-                            ProductionDate = ii.ProductionDate,
-                            ExpiryDate = ii.ExpiryDate,
-                            MovementType = "Transfer In",
-                            Date = tv.Date,
-                            FromWarehouseId = tv.FromWarehouseId,
-                            FromWarehouseName = fromWh.Name,
-                            ToWarehouseId = tv.ToWarehouseId,
-                            ToWarehouseName = toWh.Name,
-                            RelatedPerson = tvd.Supplier.Name,
-                            Quantity = tvd.Quantity,
-                        };
+                    }
+                    equals new
+                    {
+                        ii.ItemCode,
+                        ii.WarehouseId,
+                        ii.ProductionDate,
+                        ii.ExpiryDate
+                    }
+                where warehouseIds.Contains(tv.ToWarehouseId)
+                join fromWh in context.Warehouses on tv.FromWarehouseId equals fromWh.Id
+                join toWh in context.Warehouses on tv.ToWarehouseId equals toWh.Id
+                select new ItemMovementReportDTO
+                {
+                    ItemCode = tvd.ItemCode,
+                    ItemName = tvd.Item.Name,
+                    Warehouse = ii.Warehouse.Name,
+                    CurrentQuantity = ii.Quantity,
+                    ProductionDate = ii.ProductionDate,
+                    ExpiryDate = ii.ExpiryDate,
+                    MovementType = "Transfer In",
+                    Date = tv.Date,
+                    FromWarehouseId = tv.FromWarehouseId,
+                    FromWarehouseName = fromWh.Name,
+                    ToWarehouseId = tv.ToWarehouseId,
+                    ToWarehouseName = toWh.Name,
+                    RelatedPerson = tvd.Supplier.Name,
+                    Quantity = tvd.Quantity,
+                };
             #endregion
 
             // Issues (items leaving warehouses)
@@ -615,7 +663,17 @@ namespace WarehouseManagementSystem.Data.Repositories
             var issuesQuery =
                 from iv in context.IssueVouchers
                 join ivd in context.IssueVoucherDetails on iv.Id equals ivd.VoucherId
-                join ii in context.InventoryItems on new { ivd.ItemCode, iv.WarehouseId } equals new { ii.ItemCode, ii.WarehouseId }
+                join ii in context.InventoryItems
+                    on new
+                    {
+                        ivd.ItemCode,
+                        iv.WarehouseId,
+                    }
+                    equals new
+                    {
+                        ii.ItemCode,
+                        ii.WarehouseId,
+                    }
                 where warehouseIds.Contains(iv.WarehouseId)
                 join customer in context.Customers on iv.CustomerId equals customer.Id
                 select new ItemMovementReportDTO
@@ -636,6 +694,7 @@ namespace WarehouseManagementSystem.Data.Repositories
                     Quantity = ivd.Quantity,
                 };
             #endregion
+
 
             // Execute all queries in parallel
             var receipts = await receiptsQuery.ToListAsync();
@@ -797,31 +856,105 @@ namespace WarehouseManagementSystem.Data.Repositories
         public async Task<List<ItemAtWarehouseSincePeriodDTO>> GetAllAvailableItemAtWarehouseSincePeriod(List<int> warehouseIds)
         {
             using var context = new WarehouseDbContext();
+
+            #region Receipt Query
+            var itemAvailableSince = await
+                (from ii in context.InventoryItems
+                     .Include(ii => ii.Item)
+                     .Include(ii => ii.Warehouse)
+                 join rvd in context.ReceiptVoucherDetails
+                     on new { ii.ItemCode, ii.ProductionDate, ii.ExpiryDate }
+                     equals new { rvd.ItemCode, rvd.ProductionDate, rvd.ExpiryDate }
+                 join rv in context.ReceiptVouchers
+                     .Include(rv => rv.Supplier)
+                     on rvd.VoucherId equals rv.Id
+                 where ii.Quantity > 0
+                     && ii.WarehouseId == rv.WarehouseId         // Ensure same warehouse
+                     && warehouseIds.Contains(ii.WarehouseId)     // Filter only once
+                 select new ItemAtWarehouseSincePeriodDTO
+                 {
+                     ItemCode = ii.ItemCode,
+                     ItemName = ii.Item.Name,
+                     WarehouseId = ii.WarehouseId,
+                     WarehouseName = ii.Warehouse.Name,
+                     ProductionDate = ii.ProductionDate,
+                     ExpiryDate = ii.ExpiryDate,
+                     AtWareHouseSinceDate = rv.Date,
+                     SinceDays = DateOnly.FromDateTime(DateTime.Now).DayNumber - rv.Date.DayNumber,
+                     Quantity = rvd.Quantity,
+                     SupplierName = rv.Supplier.Name,
+                     AvailableQuantity = ii.Quantity,
+                     EnteredBy = $"Supplier Receipt #{rv.Id}"
+                 }).ToListAsync();
+            #endregion
+
+            #region Incoming Transfer Query
+            var transferredItems = await
+                (from ii in context.InventoryItems
+                     .Include(ii => ii.Item)
+                     .Include(ii => ii.Warehouse)
+                 join tvd in context.TransferVoucherDetails
+                     .Include(tvd => tvd.Supplier)
+                     on new { ii.ItemCode, ii.ProductionDate, ii.ExpiryDate }
+                     equals new { tvd.ItemCode, tvd.ProductionDate, tvd.ExpiryDate }
+                 join tv in context.TransferVouchers
+                     .Include(tv => tv.FromWarehouse)
+                     on tvd.VoucherId equals tv.Id
+                 where ii.Quantity > 0
+                     && ii.WarehouseId == tv.ToWarehouseId        // Ensure same warehouse
+                     && warehouseIds.Contains(ii.WarehouseId)
+                 select new ItemAtWarehouseSincePeriodDTO
+                 {
+                     ItemCode = ii.ItemCode,
+                     ItemName = ii.Item.Name,
+                     WarehouseId = ii.WarehouseId,
+                     WarehouseName = ii.Warehouse.Name,
+                     ProductionDate = ii.ProductionDate,
+                     ExpiryDate = ii.ExpiryDate,
+                     AtWareHouseSinceDate = tv.Date,
+                     SinceDays = DateOnly.FromDateTime(DateTime.Now).DayNumber - tv.Date.DayNumber,
+                     Quantity = tvd.Quantity,
+                     SupplierName = $"{tvd.Supplier.Name} (Transfer #{tv.Id})",
+                     AvailableQuantity = ii.Quantity,
+                     EnteredBy = $"Transfer from {tv.FromWarehouse.Name}"
+                 }).ToListAsync();
+            #endregion
+
+            var results = itemAvailableSince.Concat(transferredItems).ToList();
+            return results;
+        }
+
+
+        public async Task<List<ItemRemainingDaysForExpirationDTO>> GetAllAvailableItemAtWarehouseExpiration(List<int> warehouseIds)//, DateOnly periodDate)
+        {
+            using var context = new WarehouseDbContext();
             #region Receipt Query
             var itemAvailableSince = await
                     (from ii in context.InventoryItems
+                         .Include(ii => ii.Warehouse)
+                         .Include(ii => ii.Item)
                      join rvd in context.ReceiptVoucherDetails
                          on new { ii.ItemCode, ii.ProductionDate, ii.ExpiryDate }
                          equals new { rvd.ItemCode, rvd.ProductionDate, rvd.ExpiryDate }
-                     join rv in context.ReceiptVouchers
+                     join rv in context.ReceiptVouchers.Include(rv => rv.Supplier)
                          on rvd.VoucherId equals rv.Id
                      where ii.Quantity > 0
+                         && ii.WarehouseId == rv.WarehouseId   // <-- Key Fix
                          && warehouseIds.Contains(ii.WarehouseId)
-                         && warehouseIds.Contains(rv.WarehouseId)
-                     select new ItemAtWarehouseSincePeriodDTO
+                     select new ItemRemainingDaysForExpirationDTO
                      {
-                         ItemCode = ii.ItemCode,
-                         ItemName = ii.Item.Name,
                          WarehouseId = ii.WarehouseId,
                          WarehouseName = ii.Warehouse.Name,
+                         ItemCode = ii.ItemCode,
+                         ItemName = ii.Item.Name,
                          ProductionDate = ii.ProductionDate,
                          ExpiryDate = ii.ExpiryDate,
-                         AtWareHouseSinceDate = rv.Date,
-                         SinceDays = DateOnly.FromDateTime(DateTime.Now).DayNumber - rv.Date.DayNumber,
-                         Quantity = rvd.Quantity,
-                         SupplierName = rv.Supplier.Name,
                          AvailableQuantity = ii.Quantity,
-                         EnteredBy = $"Supplier Receipt #{rv.Id}"
+                         RemainingDays = ii.ExpiryDate.DayNumber - DateOnly.FromDateTime(DateTime.Now).DayNumber,
+                         AtWareHouseSinceDate = rv.Date,
+                         SupplierName = rv.Supplier.Name,
+                         EnteredBy = $"Supplier Receipt #{rv.Id}",
+                         Quantity = rvd.Quantity
                      }).ToListAsync();
 
             #endregion
@@ -830,109 +963,32 @@ namespace WarehouseManagementSystem.Data.Repositories
             // Incoming Transfers
             #region Incoming Transfer Query
             var transferredItems = await
-            (from ii in context.InventoryItems
-             join tvd in context.TransferVoucherDetails
-                 on new { ii.ItemCode, ii.ProductionDate, ii.ExpiryDate }
-                 equals new { tvd.ItemCode, tvd.ProductionDate, tvd.ExpiryDate }
-             join tv in context.TransferVouchers
-                 on tvd.VoucherId equals tv.Id
-             where ii.Quantity > 0
-                 && warehouseIds.Contains(ii.WarehouseId)
-                 && tv.ToWarehouseId == ii.WarehouseId
-             select new ItemAtWarehouseSincePeriodDTO
-             {
-                 ItemCode = ii.ItemCode,
-                 ItemName = ii.Item.Name,
-                 WarehouseId = ii.WarehouseId,
-                 WarehouseName = ii.Warehouse.Name,
-                 ProductionDate = ii.ProductionDate,
-                 ExpiryDate = ii.ExpiryDate,
-                 AtWareHouseSinceDate = tv.Date,
-                 SinceDays = DateOnly.FromDateTime(DateTime.Now).DayNumber - tv.Date.DayNumber,
-                 Quantity = tvd.Quantity,
-                 SupplierName = $"{tvd.Supplier.Name} (Transfer #{tv.Id})",
-                 AvailableQuantity = ii.Quantity,
-                 EnteredBy = $"Transfer from {tv.FromWarehouse.Name}"
-             }).ToListAsync();
-
-            #endregion
-
-            var results = itemAvailableSince.Concat(transferredItems).ToList();
-
-            return results;
-        }
-
-        public async Task<List<ItemRemainingDaysForExpirationDTO>> GetAllAvailableItemAtWarehouseExpiration(List<int> warehouseIds)//, DateOnly periodDate)
-        {
-            using var context = new WarehouseDbContext();
-            #region Receipt Query
-            var itemAvailableSince = await
-                   (from ii in context.InventoryItems
-                       .Include(ii => ii.Warehouse)
-                       .Include(ii => ii.Item)
-                    join rvd in context.ReceiptVoucherDetails
-                        on new { ii.ItemCode, ii.ProductionDate, ii.ExpiryDate }
-                        equals new { rvd.ItemCode, rvd.ProductionDate, rvd.ExpiryDate }
-                    join rv in context.ReceiptVouchers
-                        .Include(rv => rv.Supplier)  // Include Supplier for Name
-                        on rvd.VoucherId equals rv.Id
-                    where ii.Quantity > 0
-                        && warehouseIds.Contains(ii.WarehouseId)
-                        && warehouseIds.Contains(rv.WarehouseId)
-                    select new ItemRemainingDaysForExpirationDTO
-                    {
-                        WarehouseId = ii.WarehouseId,
-                        WarehouseName = ii.Warehouse.Name,
-                        ItemCode = ii.ItemCode,
-                        ItemName = ii.Item.Name,
-                        ProductionDate = ii.ProductionDate,
-                        ExpiryDate = ii.ExpiryDate,
-                        AvailableQuantity = ii.Quantity,  // From InventoryItems
-                        RemainingDays = ii.ExpiryDate.DayNumber - DateOnly.FromDateTime(DateTime.Now).DayNumber,
-                        // Additional fields from the second query
-                        AtWareHouseSinceDate = rv.Date,
-                        SupplierName = rv.Supplier.Name,
-                        EnteredBy = $"Supplier Receipt #{rv.Id}",
-                        // Keep Quantity from receipt details if needed
-                        Quantity = rvd.Quantity
-                    }).ToListAsync();
-
-            #endregion
-
-
-            // Incoming Transfers
-            #region Incoming Transfer Query
-            var transferredItems = await
-               (from ii in context.InventoryItems
-                   .Include(ii => ii.Warehouse)
-                   .Include(ii => ii.Item)
-                join tvd in context.TransferVoucherDetails.Include(tvd => tvd.Supplier)  // Include Supplier for Name
-                    on new { ii.ItemCode, ii.ProductionDate, ii.ExpiryDate }
-                    equals new { tvd.ItemCode, tvd.ProductionDate, tvd.ExpiryDate }
-                join tv in context.TransferVouchers
-                    on tvd.VoucherId equals tv.Id
-                where ii.Quantity > 0
-                    && warehouseIds.Contains(ii.WarehouseId)
-                    && warehouseIds.Contains(tv.ToWarehouseId)
-                select new ItemRemainingDaysForExpirationDTO
-                {
-                    WarehouseId = ii.WarehouseId,
-                    WarehouseName = ii.Warehouse.Name,
-                    ItemCode = ii.ItemCode,
-                    ItemName = ii.Item.Name,
-                    ProductionDate = ii.ProductionDate,
-                    ExpiryDate = ii.ExpiryDate,
-                    AvailableQuantity = ii.Quantity,  // From InventoryItems
-                    RemainingDays = ii.ExpiryDate.DayNumber - DateOnly.FromDateTime(DateTime.Now).DayNumber,
-                    // Additional fields from the second query
-                    AtWareHouseSinceDate = tv.Date,
-                    SupplierName = $"{tvd.Supplier.Name} (Transfer #{tv.Id})",
-                    EnteredBy = $"Transfer from {tv.FromWarehouse.Name}",
-                    // Keep Quantity from receipt details if needed
-                    Quantity = tvd.Quantity
-                }).ToListAsync();
-
-
+                    (from ii in context.InventoryItems
+                         .Include(ii => ii.Warehouse)
+                         .Include(ii => ii.Item)
+                     join tvd in context.TransferVoucherDetails.Include(tvd => tvd.Supplier)
+                         on new { ii.ItemCode, ii.ProductionDate, ii.ExpiryDate }
+                         equals new { tvd.ItemCode, tvd.ProductionDate, tvd.ExpiryDate }
+                     join tv in context.TransferVouchers
+                         on tvd.VoucherId equals tv.Id
+                     where ii.Quantity > 0
+                         && ii.WarehouseId == tv.ToWarehouseId   // <-- Key Fix
+                         && warehouseIds.Contains(ii.WarehouseId)
+                     select new ItemRemainingDaysForExpirationDTO
+                     {
+                         WarehouseId = ii.WarehouseId,
+                         WarehouseName = ii.Warehouse.Name,
+                         ItemCode = ii.ItemCode,
+                         ItemName = ii.Item.Name,
+                         ProductionDate = ii.ProductionDate,
+                         ExpiryDate = ii.ExpiryDate,
+                         AvailableQuantity = ii.Quantity,
+                         RemainingDays = ii.ExpiryDate.DayNumber - DateOnly.FromDateTime(DateTime.Now).DayNumber,
+                         AtWareHouseSinceDate = tv.Date,
+                         SupplierName = $"{tvd.Supplier.Name} (Transfer #{tv.Id})",
+                         EnteredBy = $"Transfer from {tv.FromWarehouse.Name}",
+                         Quantity = tvd.Quantity
+                     }).ToListAsync();
 
             #endregion
 

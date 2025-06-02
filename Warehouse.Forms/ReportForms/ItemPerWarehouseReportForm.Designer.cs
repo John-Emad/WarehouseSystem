@@ -1,6 +1,6 @@
 ﻿namespace WarehouseManagmentSystem.WinForms.ReportForms
 {
-    partial class ItemReportForm
+    partial class ItemPerWarehouseReportForm
     {
         /// <summary>
         /// Required designer variable.
@@ -54,7 +54,7 @@
             // ReportForItemsComboBox
             // 
             ReportForItemsComboBox.FormattingEnabled = true;
-            ReportForItemsComboBox.Location = new Point(224, 703);
+            ReportForItemsComboBox.Location = new Point(825, 731);
             ReportForItemsComboBox.Name = "ReportForItemsComboBox";
             ReportForItemsComboBox.Size = new Size(250, 28);
             ReportForItemsComboBox.TabIndex = 25;
@@ -73,7 +73,7 @@
             // WithinRangeDateCheckBox
             // 
             WithinRangeDateCheckBox.AutoSize = true;
-            WithinRangeDateCheckBox.Location = new Point(70, 778);
+            WithinRangeDateCheckBox.Location = new Point(707, 788);
             WithinRangeDateCheckBox.Name = "WithinRangeDateCheckBox";
             WithinRangeDateCheckBox.Size = new Size(157, 24);
             WithinRangeDateCheckBox.TabIndex = 23;
@@ -83,14 +83,14 @@
             // 
             // ReportEndDateDatePicker
             // 
-            ReportEndDateDatePicker.Location = new Point(224, 896);
+            ReportEndDateDatePicker.Location = new Point(825, 897);
             ReportEndDateDatePicker.Name = "ReportEndDateDatePicker";
             ReportEndDateDatePicker.Size = new Size(250, 27);
             ReportEndDateDatePicker.TabIndex = 22;
             // 
             // ReportStartDateDatePicker
             // 
-            ReportStartDateDatePicker.Location = new Point(224, 840);
+            ReportStartDateDatePicker.Location = new Point(825, 841);
             ReportStartDateDatePicker.Name = "ReportStartDateDatePicker";
             ReportStartDateDatePicker.Size = new Size(250, 27);
             ReportStartDateDatePicker.TabIndex = 21;
@@ -103,7 +103,7 @@
             ReportViewGridView.Location = new Point(0, 0);
             ReportViewGridView.Name = "ReportViewGridView";
             ReportViewGridView.RowHeadersWidth = 51;
-            ReportViewGridView.Size = new Size(2319, 555);
+            ReportViewGridView.Size = new Size(2319, 659);
             ReportViewGridView.TabIndex = 20;
             ReportViewGridView.CellFormatting += ReportViewGridView_CellFormatting;
             ReportViewGridView.CellPainting += ReportViewGridView_CellPainting;
@@ -113,16 +113,16 @@
             // ReportForItemsLabel
             // 
             ReportForItemsLabel.AutoSize = true;
-            ReportForItemsLabel.Location = new Point(70, 706);
+            ReportForItemsLabel.Location = new Point(707, 734);
             ReportForItemsLabel.Name = "ReportForItemsLabel";
-            ReportForItemsLabel.Size = new Size(92, 20);
+            ReportForItemsLabel.Size = new Size(39, 20);
             ReportForItemsLabel.TabIndex = 27;
-            ReportForItemsLabel.Text = "Choose Item";
+            ReportForItemsLabel.Text = "Item";
             // 
             // FromDateLabel
             // 
             FromDateLabel.AutoSize = true;
-            FromDateLabel.Location = new Point(70, 845);
+            FromDateLabel.Location = new Point(707, 846);
             FromDateLabel.Name = "FromDateLabel";
             FromDateLabel.Size = new Size(81, 20);
             FromDateLabel.TabIndex = 28;
@@ -131,7 +131,7 @@
             // ToDateLabel
             // 
             ToDateLabel.AutoSize = true;
-            ToDateLabel.Location = new Point(70, 901);
+            ToDateLabel.Location = new Point(707, 902);
             ToDateLabel.Name = "ToDateLabel";
             ToDateLabel.Size = new Size(32, 20);
             ToDateLabel.TabIndex = 29;
@@ -140,7 +140,7 @@
             // ReportForWarehousesCheckBoxList
             // 
             ReportForWarehousesCheckBoxList.FormattingEnabled = true;
-            ReportForWarehousesCheckBoxList.Location = new Point(846, 693);
+            ReportForWarehousesCheckBoxList.Location = new Point(199, 727);
             ReportForWarehousesCheckBoxList.Name = "ReportForWarehousesCheckBoxList";
             ReportForWarehousesCheckBoxList.Size = new Size(308, 180);
             ReportForWarehousesCheckBoxList.TabIndex = 30;
@@ -149,7 +149,7 @@
             // ReportForWarehousesLabel
             // 
             ReportForWarehousesLabel.AutoSize = true;
-            ReportForWarehousesLabel.Location = new Point(643, 706);
+            ReportForWarehousesLabel.Location = new Point(22, 734);
             ReportForWarehousesLabel.Name = "ReportForWarehousesLabel";
             ReportForWarehousesLabel.Size = new Size(151, 20);
             ReportForWarehousesLabel.TabIndex = 31;
@@ -174,7 +174,7 @@
             Controls.Add(ReportViewGridView);
             Name = "ItemReportForm";
             StartPosition = FormStartPosition.CenterScreen;
-            Text = "ItemReportForm";
+            Text = "Item per warehouse";
             WindowState = FormWindowState.Maximized;
             Load += ItemReportForm_Load;
             ((System.ComponentModel.ISupportInitialize)ReportViewGridView).EndInit();

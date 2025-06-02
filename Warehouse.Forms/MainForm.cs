@@ -58,9 +58,9 @@ namespace WarehouseManagmentSystem.WinForms
 
             // Item Reports Submenu
             ToolStripMenuItem itemReportsMenu = new ToolStripMenuItem("Item Reports");
-            itemReportsMenu.DropDownItems.Add("Item Report", null, (s, e) => OpenForm(new ItemReportForm()));
-            itemReportsMenu.DropDownItems.Add("Item Transfer Report", null, (s, e) => OpenForm(new ItemTransferReportForm()));
-            itemReportsMenu.DropDownItems.Add("Item Since Period Report", null, (s, e) => OpenForm(new ItemAtWarehouseSincePeriodReportForm()));
+            itemReportsMenu.DropDownItems.Add("Item/Warehouse(s) Report", null, (s, e) => OpenForm(new ItemPerWarehouseReportForm()));
+            itemReportsMenu.DropDownItems.Add("Transfer Report", null, (s, e) => OpenForm(new ItemTransferReportForm()));
+            itemReportsMenu.DropDownItems.Add("Since Period Report", null, (s, e) => OpenForm(new ItemAtWarehouseSincePeriodReportForm()));
             itemReportsMenu.DropDownItems.Add("Expiration Report", null, (s, e) => OpenForm(new ItemAtWarehouseDaysTillExpirationReportForm()));
 
             // Warehouse Reports Submenu

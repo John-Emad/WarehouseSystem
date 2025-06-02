@@ -11,7 +11,7 @@ namespace WarehouseManagmentSystem.WinForms
     public partial class IssueVoucherForm : Form
     {
         #region Fields
-        List<AvailableItemsAtWarehouseDTO> AvailableItemsAtWarehouseList;
+        private List<AvailableItemsAtWarehouseDTO> AvailableItemsAtWarehouseList;
         private List<AvailableItemsAtWarehouseDTO> SelectedItemsList;
         private bool isFormLoading = false;
         private int warehouseId;
@@ -478,6 +478,8 @@ namespace WarehouseManagmentSystem.WinForms
                     VoucherId = issueVoucher.Id,
                     ItemCode = item.ItemCode,
                     Quantity = item.ItemQuantity,
+                    ProductionDate = item.ProductionDate,
+                    ExpiryDate = item.ExpiryDate,
                 };
 
                 await _issueVoucherDetailsRepository.AddAsync(detail);
