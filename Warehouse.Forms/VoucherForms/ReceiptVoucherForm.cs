@@ -96,6 +96,8 @@ namespace WarehouseManagmentSystem.WinForms
             if (ReceiptVoucherItemsGridView.Columns.Contains("ExpiryDate"))
                 ReceiptVoucherItemsGridView.Columns["ExpiryDate"].HeaderText = "Exp Date";
 
+            if (ReceiptVoucherItemsGridView.Columns.Contains("ItemName"))
+                ReceiptVoucherItemsGridView.Columns["ItemName"].HeaderText = "Name";
         }
         #endregion
 
@@ -264,7 +266,7 @@ namespace WarehouseManagmentSystem.WinForms
         {
             if (isFormLoading) return;
 
-            if (ReceiptVoucherWarehouseComboBox.SelectedIndex > 0)
+            if (ReceiptVoucherWarehouseComboBox.SelectedIndex != -1)
             {
                 UserChosenWarehouseViewLabel.Text = ReceiptVoucherWarehouseComboBox.Text;
             }
@@ -395,7 +397,7 @@ namespace WarehouseManagmentSystem.WinForms
                 if (rowIndex >= 0 && rowIndex < InventoryItemViewDTOList.Count)
                 {
                     // Get the selected item's name (adjust column name as needed)
-                    var selectedItemName = ReceiptVoucherItemsGridView.Rows[rowIndex].Cells["Name"].Value?.ToString();
+                    var selectedItemName = ReceiptVoucherItemsGridView.Rows[rowIndex].Cells["ItemName"].Value?.ToString();
 
                     // Confirm deletion
                     var result = MessageBox.Show($"Delete '{selectedItemName}' from receipt?",

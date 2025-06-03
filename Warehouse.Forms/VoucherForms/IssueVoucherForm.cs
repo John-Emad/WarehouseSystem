@@ -239,22 +239,29 @@ namespace WarehouseManagmentSystem.WinForms
         }
         private void IssueSelectedItemsGridView_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
-            if (e.RowIndex >= 0 && e.RowIndex <= IssueVoucherItemsGridView.Rows.Count)
+            if (e.RowIndex >= 0 && e.RowIndex < IssueSelectedItemsGridView.Rows.Count)
             {
                 var grid = IssueSelectedItemsGridView;
-
                 DataGridViewRow editedRow = grid.Rows[e.RowIndex];
+
                 string itemCode = editedRow.Cells["ItemCode"].Value?.ToString();
+                DateOnly? productionDate = editedRow.Cells["ProductionDate"].Value as DateOnly?;
+                DateOnly? expiryDate = editedRow.Cells["ExpiryDate"].Value as DateOnly?;
                 string editedValue = editedRow.Cells["ItemQuantity"].Value?.ToString();
+
+                if (string.IsNullOrEmpty(itemCode) || !productionDate.HasValue || !expiryDate.HasValue)
+                    return;
 
                 if (decimal.TryParse(editedValue, out decimal newQuantity))
                 {
-                    // Lookup the original available quantity from the IssueVoucherItemsGridView
                     decimal availableQuantity = 0;
+
                     foreach (DataGridViewRow originalRow in IssueVoucherItemsGridView.Rows)
                     {
-                        if (originalRow.DataBoundItem is AvailableItemsAtWarehouseDTO originalItem
-                            && originalItem.ItemCode == itemCode)
+                        if (originalRow.DataBoundItem is AvailableItemsAtWarehouseDTO originalItem &&
+                            originalItem.ItemCode == itemCode &&
+                            originalItem.ProductionDate == productionDate &&
+                            originalItem.ExpiryDate == expiryDate)
                         {
                             availableQuantity = originalItem.ItemQuantity;
                             break;
@@ -277,9 +284,10 @@ namespace WarehouseManagmentSystem.WinForms
                     MessageBox.Show("Please enter a valid numeric quantity.", "Invalid Input", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     editedRow.Cells["ItemQuantity"].Value = 1; // Default reset
                 }
-
             }
         }
+
+        
         private void IssueSelectedItemsGridView_CellBeginEdit(object sender, DataGridViewCellCancelEventArgs e)
         {
             if (IssueSelectedItemsGridView.Columns[e.ColumnIndex].Name != "ItemQuantity")

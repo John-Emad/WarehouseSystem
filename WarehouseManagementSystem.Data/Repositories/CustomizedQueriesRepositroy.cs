@@ -18,12 +18,12 @@ namespace WarehouseManagementSystem.Data.Repositories
         }
         #endregion
 
-        #region Queries
-
+        #region Transfer Queries
         public async Task<List<AvailableItemsAtWarehouseDTO>> GetAvailableItemsAtWarehouseWithSupplierTransferAsync(int warehouseId)
         {
             using (var warehouseSystemDbContext = new WarehouseDbContext())
             {
+                #region Receipt Query
                 // Query for items with receipt voucher details
                 var receiptItemsQuery =
                     from ii in warehouseSystemDbContext.InventoryItems
@@ -31,8 +31,8 @@ namespace WarehouseManagementSystem.Data.Repositories
                     join i in warehouseSystemDbContext.Items on ii.ItemCode equals i.Code
                     join w in warehouseSystemDbContext.Warehouses on ii.WarehouseId equals w.Id
                     join rvd in warehouseSystemDbContext.ReceiptVoucherDetails on
-                        new { ii.ItemCode, ii.WarehouseId } equals
-                        new { rvd.ItemCode, WarehouseId = rvd.Voucher.WarehouseId }
+                        new { ii.ItemCode, ii.WarehouseId, ii.ProductionDate, ii.ExpiryDate } equals
+                        new { rvd.ItemCode, WarehouseId = rvd.Voucher.WarehouseId, rvd.ProductionDate, rvd.ExpiryDate }
                     join rv in warehouseSystemDbContext.ReceiptVouchers on rvd.VoucherId equals rv.Id
                     join s in warehouseSystemDbContext.People.OfType<Supplier>() on rv.SupplierId equals s.Id
                     select new AvailableItemsAtWarehouseDTO
@@ -47,7 +47,9 @@ namespace WarehouseManagementSystem.Data.Repositories
                         ProductionDate = ii.ProductionDate,
                         ExpiryDate = ii.ExpiryDate,
                     };
+                #endregion
 
+                #region Transfer Query
                 // Query for items with transfer voucher details
                 var transferItemsQuery =
                     from ii in warehouseSystemDbContext.InventoryItems
@@ -55,8 +57,8 @@ namespace WarehouseManagementSystem.Data.Repositories
                     join i in warehouseSystemDbContext.Items on ii.ItemCode equals i.Code
                     join w in warehouseSystemDbContext.Warehouses on ii.WarehouseId equals w.Id
                     join tvd in warehouseSystemDbContext.TransferVoucherDetails on
-                        new { ii.ItemCode, ii.WarehouseId } equals
-                        new { tvd.ItemCode, WarehouseId = tvd.Voucher.ToWarehouseId }
+                        new { ii.ItemCode, ii.WarehouseId, ii.ProductionDate, ii.ExpiryDate } equals
+                        new { tvd.ItemCode, WarehouseId = tvd.Voucher.ToWarehouseId, tvd.ProductionDate, tvd.ExpiryDate }
                     join tv in warehouseSystemDbContext.TransferVouchers on tvd.VoucherId equals tv.Id
                     join s in warehouseSystemDbContext.People.OfType<Supplier>() on tvd.SupplierId equals s.Id into suppliers
                     from s in suppliers.DefaultIfEmpty() // Left join in case supplier is null
@@ -72,15 +74,15 @@ namespace WarehouseManagementSystem.Data.Repositories
                         ProductionDate = ii.ProductionDate,
                         ExpiryDate = ii.ExpiryDate,
                     };
+                #endregion
 
                 // Combine both queries and return distinct items
-                return await receiptItemsQuery
-                    .Union(transferItemsQuery)
-                    .Distinct()
-                    .ToListAsync();
+                var combined = await receiptItemsQuery
+                        .Union(transferItemsQuery)
+                        .ToListAsync();
+                return combined;
             }
         }
-
         #endregion
 
         #region Warehouse Report
@@ -92,8 +94,8 @@ namespace WarehouseManagementSystem.Data.Repositories
             // Receipts
             var receipts = from rvd in context.ReceiptVoucherDetails
                            join rv in context.ReceiptVouchers on rvd.VoucherId equals rv.Id
-                           join ii in context.InventoryItems 
-                           on new { rvd.ItemCode, rv.WarehouseId, rvd.ProductionDate, rvd.ExpiryDate } 
+                           join ii in context.InventoryItems
+                           on new { rvd.ItemCode, rv.WarehouseId, rvd.ProductionDate, rvd.ExpiryDate }
                            equals new { ii.ItemCode, ii.WarehouseId, ii.ProductionDate, ii.ExpiryDate }
                            join item in context.Items on ii.ItemCode equals item.Code
                            join s in context.People.OfType<Supplier>() on rv.SupplierId equals s.Id
