@@ -1,4 +1,5 @@
-﻿using WarehouseManagmentSystem.WinForms.Forms;
+﻿using WarehouseManagementSystem.Domain.DTOs;
+using WarehouseManagmentSystem.WinForms.Forms;
 using WarehouseManagmentSystem.WinForms.ItemsForms;
 using WarehouseManagmentSystem.WinForms.PeopleForms;
 using WarehouseManagmentSystem.WinForms.ReportForms;
@@ -96,5 +97,95 @@ namespace WarehouseManagmentSystem.WinForms
             currentActiveForm = childForm;
             this.Text = $"Warehouse Management System - {childForm.Text}";
         }
+
+        #region People event handler
+        private void AddCustomerButton_Click(object sender, EventArgs e)
+        {
+            OpenForm(new AddCustomerForm());
+        }
+
+        private void EditCustomerButton_Click(object sender, EventArgs e)
+        {
+            OpenForm(new EditCustomerForm());
+        }
+
+        private void AddSupplierButton_Click(object sender, EventArgs e)
+        {
+            OpenForm(new AddSupplierForm());
+        }
+
+        private void EditSupplierButton_Click(object sender, EventArgs e)
+        {
+            OpenForm(new EditSupplierForm());
+        }
+        #endregion
+
+        #region Warehouse Event Handler
+        private void AddWarehouseButton_Click(object sender, EventArgs e)
+        {
+            OpenForm(new WarehouseForm());
+        }
+
+        private void EditWarehouseButton_Click(object sender, EventArgs e)
+        {
+            OpenForm(new EditWarehouseForm());
+        }
+        #endregion
+
+        #region Item Event handler
+        private void AddItemButton_Click(object sender, EventArgs e)
+        {
+            OpenForm(new ItemForm());
+        }
+
+        private void EditItemButton_Click(object sender, EventArgs e)
+        {
+            OpenForm(new EditItemForm());
+        }
+        #endregion
+
+        #region Vouchers Event handler
+        private void CreateReceiptVoucherButton_Click(object sender, EventArgs e)
+        {
+            OpenForm(new ReceiptVoucherForm());
+        }
+
+        private void CreateTransferVoucherButton_Click(object sender, EventArgs e)
+        {
+            OpenForm(new TransferVoucherForm());
+        }
+
+        private void CreateIssueVoucherButton_Click(object sender, EventArgs e)
+        {
+            OpenForm(new IssueVoucherForm());
+        }
+        #endregion
+
+        #region Reports Event handler
+        private void ItemPerWarehouseReport_Click(object sender, EventArgs e)
+        {
+            OpenForm(new ItemPerWarehouseReportForm());
+        }
+
+        private void ItemTransferReportButton_Click(object sender, EventArgs e)
+        {
+            OpenForm(new ItemTransferReportForm());
+        }
+
+        private void ItemAtWarehouseSinceDays_Click(object sender, EventArgs e)
+        {
+            OpenForm(new ItemAtWarehouseSincePeriodReportForm());
+        }
+
+        private void ItemRemainigDaysTillExpirationButton_Click(object sender, EventArgs e)
+        {
+            OpenForm(new ItemAtWarehouseDaysTillExpirationReportForm());
+        }
+
+        private void WarehouseReportButton_Click(object sender, EventArgs e)
+        {
+            OpenForm(new WarehousReportForm());
+        } 
+        #endregion
     }
 }
