@@ -45,7 +45,6 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
             WithinRangeDateCheckBox.Visible = true;
 
             ActionButton.Visible = true;
-            ActionButton.Text = "Display";
         }
 
         #endregion
@@ -105,6 +104,9 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
 
             if (ReportViewGridView.Columns.Contains("IsSummaryRow"))
                 ReportViewGridView.Columns["IsSummaryRow"].Visible = false;
+
+            if (ReportViewGridView.Columns.Contains("IsItemRow"))
+                ReportViewGridView.Columns["IsItemRow"].Visible = false;
             #endregion
 
             #region Rename
@@ -188,7 +190,16 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
                     {
                         e.Graphics.FillRectangle(backBrush, fullBounds);
 
-                        string summaryText = $"📦 {item.ItemName} • {item.CurrentItemQuantity:F2} in Stock   |   🏷 Prod: {item.ProductionDate:yyyy-MM-dd}   |   ⏳ Exp: {item.ExpiryDate:yyyy-MM-dd}";
+                        //string summaryText = $"📦 {item.ItemName} • {item.CurrentItemQuantity:F2} in Stock   |   🏷 Prod: {item.ProductionDate:yyyy-MM-dd}   |   ⏳ Exp: {item.ExpiryDate:yyyy-MM-dd}";
+                        string summaryText;
+                        if (item.IsItemRow)
+                        {
+                            summaryText = $"📦 ITEM: {item.ItemName.ToUpper()}";
+                        }
+                        else
+                        {
+                            summaryText = $"📦 {item.CurrentItemQuantity:F2} in Stock   |   🏷 Prod: {item.ProductionDate:yyyy-MM-dd}   |   ⏳ Exp: {item.ExpiryDate:yyyy-MM-dd}";
+                        }
 
                         Rectangle textBounds = new Rectangle(
                             fullBounds.X + 10,
@@ -292,30 +303,48 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
         #region Warehouse GridView Data Manipulation
         private List<WarehouseItemsStateWithTransfer> ConfigureReportGridView(List<WarehouseItemsStateWithTransfer> allData)
         {
-            var groupedData = allData
-                .GroupBy(x => new { x.ItemCode, x.ProductionDate, x.ExpiryDate })
+            var itemGroups = allData
+                .GroupBy(x => new { x.ItemCode, x.ItemName })
                 .ToList();
 
             var displayList = new List<WarehouseItemsStateWithTransfer>();
 
-            foreach (var group in groupedData)
+            foreach (var itemGroup in itemGroups)
             {
+                // Add Item Header (once per item)
                 displayList.Add(new WarehouseItemsStateWithTransfer
                 {
-                    ItemName = group.First().ItemName,
-                    ItemCode = group.Key.ItemCode,
-                    ProductionDate = group.Key.ProductionDate,
-                    ExpiryDate = group.Key.ExpiryDate,
-                    CurrentItemQuantity = group.First().CurrentItemQuantity,
+                    ItemCode = itemGroup.Key.ItemCode,
+                    ItemName = itemGroup.Key.ItemName,
+                    IsItemRow = true,
                     IsSummaryRow = true
                 });
 
-                // Add detail rows
-                displayList.AddRange(group);
+                // Then group by production & expiry date for this item
+                var dateGroups = itemGroup
+                    .GroupBy(x => new { x.ProductionDate, x.ExpiryDate });
 
+                foreach (var dateGroup in dateGroups)
+                {
+                    // Add summary row for batch
+                    displayList.Add(new WarehouseItemsStateWithTransfer
+                    {
+                        ItemCode = itemGroup.Key.ItemCode,
+                        ItemName = itemGroup.Key.ItemName,
+                        ProductionDate = dateGroup.Key.ProductionDate,
+                        ExpiryDate = dateGroup.Key.ExpiryDate,
+                        CurrentItemQuantity = dateGroup.First().CurrentItemQuantity,
+                        IsSummaryRow = true
+                    });
+
+                    // Add detail rows
+                    displayList.AddRange(dateGroup);
+                }
             }
+
             return displayList;
         }
+
         private async Task AddWarehouseItemsToReportGridView()
         {
             using var context = new WarehouseDbContext();
