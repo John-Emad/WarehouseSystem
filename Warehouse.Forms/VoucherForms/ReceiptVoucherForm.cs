@@ -266,7 +266,7 @@ namespace WarehouseManagmentSystem.WinForms
         {
             if (isFormLoading) return;
 
-            if (ReceiptVoucherWarehouseComboBox.SelectedIndex > 0)
+            if (ReceiptVoucherWarehouseComboBox.SelectedIndex != -1)
             {
                 UserChosenWarehouseViewLabel.Text = ReceiptVoucherWarehouseComboBox.Text;
             }
