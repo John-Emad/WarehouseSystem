@@ -114,7 +114,7 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
                 ReportViewGridView.DataSource = ConfigureReportGridView(items);
             }
 
-            HideUnnecessaryWarehouseDataColumns();
+            EditWarehouseDataGridViewColumns();
             MessageBox.Show("Searching Done");
         }
 
@@ -167,14 +167,10 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
         }
         #endregion
 
-        #region Hide Columns
-        private void HideUnnecessaryWarehouseDataColumns()
+        #region Edit Columns
+        private void EditWarehouseDataGridViewColumns()
         {
-            foreach (DataGridViewColumn column in ReportViewGridView.Columns)
-            {
-                column.ReadOnly = true;
-            }
-
+            #region Hide
             if (ReportViewGridView.Columns.Contains("ItemCode"))
                 ReportViewGridView.Columns["ItemCode"].Visible = false;
 
@@ -198,6 +194,33 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
             if (ReportViewGridView.Columns.Contains("IsSummaryRow"))
                 ReportViewGridView.Columns["IsSummaryRow"].Visible = false;
 
+            if (ReportViewGridView.Columns.Contains("IsWarehouseSummary"))
+                ReportViewGridView.Columns["IsWarehouseSummary"].Visible = false;
+            #endregion
+
+            #region Rename
+            if (ReportViewGridView.Columns.Contains("ProductionDate"))
+                ReportViewGridView.Columns["ProductionDate"].HeaderText = "Prod Date";
+
+            if (ReportViewGridView.Columns.Contains("ExpiryDate"))
+                ReportViewGridView.Columns["ExpiryDate"].HeaderText = "Exp Date";
+
+            if (ReportViewGridView.Columns.Contains("MovementType"))
+                ReportViewGridView.Columns["MovementType"].HeaderText = "Movement";
+
+
+            if (ReportViewGridView.Columns.Contains("FromWarehouseName"))
+                ReportViewGridView.Columns["FromWarehouseName"].HeaderText = "From Warehouse";
+
+            if (ReportViewGridView.Columns.Contains("ToWarehouseName"))
+                ReportViewGridView.Columns["ToWarehouseName"].HeaderText = "To Warehouse";
+
+            if (ReportViewGridView.Columns.Contains("Quantity"))
+                ReportViewGridView.Columns["Quantity"].HeaderText = "Quantity Moved";
+
+            if (ReportViewGridView.Columns.Contains("RelatedPerson"))
+                ReportViewGridView.Columns["RelatedPerson"].HeaderText = "Related Person (Supp-Cust)";
+            #endregion
         }
         #endregion
 
@@ -278,7 +301,17 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
                     {
                         e.Graphics.FillRectangle(backBrush, fullBounds);
 
-                        string summaryText = $"📦 {item.ItemName}   |   🏭 {item.Warehouse}";
+                        string summaryText;
+
+                        if (item.IsWarehouseSummary)
+                        {
+                            summaryText = $"🏭 WAREHOUSE: {item.Warehouse.ToUpper()}";
+                        }
+                        else
+                        {
+
+                            summaryText = $"📦 {item.ItemName}";
+                        }
 
                         Rectangle textBounds = new Rectangle(
                             fullBounds.X + 10,
@@ -308,29 +341,46 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
         #region Items transfer GridView Data Manipulation
         private List<ItemMovementReportDTO> ConfigureReportGridView(List<ItemMovementReportDTO> allData)
         {
-            var groupedData = allData
-                .GroupBy(x => new { x.ItemCode, x.Warehouse})
-                .OrderBy(g => g.Key.ItemCode)
+            var groupedByWarehouse = allData
+                .GroupBy(x => x.Warehouse)
+                .OrderBy(g => g.Key)
                 .ToList();
 
             var displayList = new List<ItemMovementReportDTO>();
 
-            foreach (var group in groupedData)
+            foreach (var warehouseGroup in groupedByWarehouse)
             {
+                // Warehouse header row
                 displayList.Add(new ItemMovementReportDTO
                 {
-                    ItemCode = group.First().ItemCode,
-                    ItemName = group.First().ItemName,
-                    Warehouse = group.Key.Warehouse,
-                    IsSummaryRow = true
+                    Warehouse = warehouseGroup.Key,
+                    IsSummaryRow = true,
+                    IsWarehouseSummary = true
                 });
 
-                // Add detail rows
-                displayList.AddRange(group);
+                var groupedByItem = warehouseGroup
+                    .GroupBy(x => new { x.ItemCode, x.ItemName })
+                    .OrderBy(g => g.Key.ItemName);
 
+                foreach (var itemGroup in groupedByItem)
+                {
+                    // Item header row
+                    displayList.Add(new ItemMovementReportDTO
+                    {
+                        ItemCode = itemGroup.Key.ItemCode,
+                        ItemName = itemGroup.Key.ItemName,
+                        Warehouse = warehouseGroup.Key,
+                        IsSummaryRow = true,
+                    });
+
+                    // Add detailed rows
+                    displayList.AddRange(itemGroup);
+                }
             }
+
             return displayList;
         }
+
         #endregion
     }
 }

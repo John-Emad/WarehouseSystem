@@ -46,7 +46,7 @@
             // CurrentItemLabel
             // 
             CurrentItemLabel.AutoSize = true;
-            CurrentItemLabel.Location = new Point(1569, 629);
+            CurrentItemLabel.Location = new Point(1030, 742);
             CurrentItemLabel.Name = "CurrentItemLabel";
             CurrentItemLabel.Size = new Size(0, 20);
             CurrentItemLabel.TabIndex = 26;
@@ -54,7 +54,7 @@
             // ReportForItemsComboBox
             // 
             ReportForItemsComboBox.FormattingEnabled = true;
-            ReportForItemsComboBox.Location = new Point(825, 731);
+            ReportForItemsComboBox.Location = new Point(673, 734);
             ReportForItemsComboBox.Name = "ReportForItemsComboBox";
             ReportForItemsComboBox.Size = new Size(250, 28);
             ReportForItemsComboBox.TabIndex = 25;
@@ -62,7 +62,7 @@
             // 
             // ActionButton
             // 
-            ActionButton.Location = new Point(1309, 883);
+            ActionButton.Location = new Point(1030, 819);
             ActionButton.Name = "ActionButton";
             ActionButton.Size = new Size(271, 56);
             ActionButton.TabIndex = 24;
@@ -73,7 +73,7 @@
             // WithinRangeDateCheckBox
             // 
             WithinRangeDateCheckBox.AutoSize = true;
-            WithinRangeDateCheckBox.Location = new Point(707, 788);
+            WithinRangeDateCheckBox.Location = new Point(570, 788);
             WithinRangeDateCheckBox.Name = "WithinRangeDateCheckBox";
             WithinRangeDateCheckBox.Size = new Size(157, 24);
             WithinRangeDateCheckBox.TabIndex = 23;
@@ -83,14 +83,14 @@
             // 
             // ReportEndDateDatePicker
             // 
-            ReportEndDateDatePicker.Location = new Point(825, 897);
+            ReportEndDateDatePicker.Location = new Point(673, 887);
             ReportEndDateDatePicker.Name = "ReportEndDateDatePicker";
             ReportEndDateDatePicker.Size = new Size(250, 27);
             ReportEndDateDatePicker.TabIndex = 22;
             // 
             // ReportStartDateDatePicker
             // 
-            ReportStartDateDatePicker.Location = new Point(825, 841);
+            ReportStartDateDatePicker.Location = new Point(673, 833);
             ReportStartDateDatePicker.Name = "ReportStartDateDatePicker";
             ReportStartDateDatePicker.Size = new Size(250, 27);
             ReportStartDateDatePicker.TabIndex = 21;
@@ -103,7 +103,7 @@
             ReportViewGridView.Location = new Point(0, 0);
             ReportViewGridView.Name = "ReportViewGridView";
             ReportViewGridView.RowHeadersWidth = 51;
-            ReportViewGridView.Size = new Size(2319, 659);
+            ReportViewGridView.Size = new Size(2319, 653);
             ReportViewGridView.TabIndex = 20;
             ReportViewGridView.CellFormatting += ReportViewGridView_CellFormatting;
             ReportViewGridView.CellPainting += ReportViewGridView_CellPainting;
@@ -113,7 +113,7 @@
             // ReportForItemsLabel
             // 
             ReportForItemsLabel.AutoSize = true;
-            ReportForItemsLabel.Location = new Point(707, 734);
+            ReportForItemsLabel.Location = new Point(570, 734);
             ReportForItemsLabel.Name = "ReportForItemsLabel";
             ReportForItemsLabel.Size = new Size(39, 20);
             ReportForItemsLabel.TabIndex = 27;
@@ -122,7 +122,7 @@
             // FromDateLabel
             // 
             FromDateLabel.AutoSize = true;
-            FromDateLabel.Location = new Point(707, 846);
+            FromDateLabel.Location = new Point(570, 838);
             FromDateLabel.Name = "FromDateLabel";
             FromDateLabel.Size = new Size(81, 20);
             FromDateLabel.TabIndex = 28;
@@ -131,7 +131,7 @@
             // ToDateLabel
             // 
             ToDateLabel.AutoSize = true;
-            ToDateLabel.Location = new Point(707, 902);
+            ToDateLabel.Location = new Point(570, 894);
             ToDateLabel.Name = "ToDateLabel";
             ToDateLabel.Size = new Size(32, 20);
             ToDateLabel.TabIndex = 29;
@@ -155,7 +155,7 @@
             ReportForWarehousesLabel.TabIndex = 31;
             ReportForWarehousesLabel.Text = "Choose Warehouse(s)";
             // 
-            // ItemReportForm
+            // ItemPerWarehouseReportForm
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
@@ -172,9 +172,9 @@
             Controls.Add(ReportEndDateDatePicker);
             Controls.Add(ReportStartDateDatePicker);
             Controls.Add(ReportViewGridView);
-            Name = "ItemReportForm";
+            Name = "ItemPerWarehouseReportForm";
             StartPosition = FormStartPosition.CenterScreen;
-            Text = "Item per warehouse";
+            Text = "Item Per Warehouse(s) Report";
             WindowState = FormWindowState.Maximized;
             Load += ItemReportForm_Load;
             ((System.ComponentModel.ISupportInitialize)ReportViewGridView).EndInit();

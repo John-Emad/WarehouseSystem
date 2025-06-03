@@ -43,8 +43,9 @@
             // 
             // ReportForComboBox
             // 
+            ReportForComboBox.Font = new Font("Segoe UI", 9F);
             ReportForComboBox.FormattingEnabled = true;
-            ReportForComboBox.Location = new Point(225, 669);
+            ReportForComboBox.Location = new Point(199, 727);
             ReportForComboBox.Name = "ReportForComboBox";
             ReportForComboBox.Size = new Size(250, 28);
             ReportForComboBox.TabIndex = 18;
@@ -52,18 +53,20 @@
             // 
             // ActionButton
             // 
-            ActionButton.Location = new Point(1129, 879);
+            ActionButton.Font = new Font("Segoe UI", 9F);
+            ActionButton.Location = new Point(1031, 819);
             ActionButton.Name = "ActionButton";
             ActionButton.Size = new Size(271, 56);
             ActionButton.TabIndex = 17;
-            ActionButton.Text = "Display";
+            ActionButton.Text = "Search";
             ActionButton.UseVisualStyleBackColor = true;
             ActionButton.Click += ActionButton_Click;
             // 
             // WithinRangeDateCheckBox
             // 
             WithinRangeDateCheckBox.AutoSize = true;
-            WithinRangeDateCheckBox.Location = new Point(71, 744);
+            WithinRangeDateCheckBox.Font = new Font("Segoe UI", 9F);
+            WithinRangeDateCheckBox.Location = new Point(570, 734);
             WithinRangeDateCheckBox.Name = "WithinRangeDateCheckBox";
             WithinRangeDateCheckBox.Size = new Size(157, 24);
             WithinRangeDateCheckBox.TabIndex = 16;
@@ -73,14 +76,16 @@
             // 
             // ReportEndDateDatePicker
             // 
-            ReportEndDateDatePicker.Location = new Point(225, 862);
+            ReportEndDateDatePicker.Font = new Font("Segoe UI", 9F);
+            ReportEndDateDatePicker.Location = new Point(724, 850);
             ReportEndDateDatePicker.Name = "ReportEndDateDatePicker";
             ReportEndDateDatePicker.Size = new Size(250, 27);
             ReportEndDateDatePicker.TabIndex = 15;
             // 
             // ReportStartDateDatePicker
             // 
-            ReportStartDateDatePicker.Location = new Point(225, 806);
+            ReportStartDateDatePicker.Font = new Font("Segoe UI", 9F);
+            ReportStartDateDatePicker.Location = new Point(724, 794);
             ReportStartDateDatePicker.Name = "ReportStartDateDatePicker";
             ReportStartDateDatePicker.Size = new Size(250, 27);
             ReportStartDateDatePicker.TabIndex = 14;
@@ -88,7 +93,8 @@
             // ToDateLabel
             // 
             ToDateLabel.AutoSize = true;
-            ToDateLabel.Location = new Point(71, 867);
+            ToDateLabel.Font = new Font("Segoe UI", 9F);
+            ToDateLabel.Location = new Point(570, 855);
             ToDateLabel.Name = "ToDateLabel";
             ToDateLabel.Size = new Size(28, 20);
             ToDateLabel.TabIndex = 13;
@@ -97,7 +103,8 @@
             // ReportForLabel
             // 
             ReportForLabel.AutoSize = true;
-            ReportForLabel.Location = new Point(71, 672);
+            ReportForLabel.Font = new Font("Segoe UI", 9F);
+            ReportForLabel.Location = new Point(22, 734);
             ReportForLabel.Name = "ReportForLabel";
             ReportForLabel.Size = new Size(82, 20);
             ReportForLabel.TabIndex = 12;
@@ -106,7 +113,8 @@
             // FromDateLabel
             // 
             FromDateLabel.AutoSize = true;
-            FromDateLabel.Location = new Point(71, 811);
+            FromDateLabel.Font = new Font("Segoe UI", 9F);
+            FromDateLabel.Location = new Point(570, 799);
             FromDateLabel.Name = "FromDateLabel";
             FromDateLabel.Size = new Size(77, 20);
             FromDateLabel.TabIndex = 11;
@@ -114,13 +122,17 @@
             // 
             // ReportViewGridView
             // 
+            ReportViewGridView.AllowUserToAddRows = false;
+            ReportViewGridView.AllowUserToDeleteRows = false;
+            ReportViewGridView.AllowUserToOrderColumns = true;
             ReportViewGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             ReportViewGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             ReportViewGridView.Dock = DockStyle.Top;
             ReportViewGridView.Location = new Point(0, 0);
             ReportViewGridView.Name = "ReportViewGridView";
+            ReportViewGridView.ReadOnly = true;
             ReportViewGridView.RowHeadersWidth = 51;
-            ReportViewGridView.Size = new Size(2322, 555);
+            ReportViewGridView.Size = new Size(2322, 653);
             ReportViewGridView.TabIndex = 10;
             ReportViewGridView.CellFormatting += ReportViewGridView_CellFormatting;
             ReportViewGridView.CellPainting += ReportViewGridView_CellPainting;
@@ -130,9 +142,10 @@
             // CurrentWarehouseLabel
             // 
             CurrentWarehouseLabel.AutoSize = true;
+            CurrentWarehouseLabel.Font = new Font("Segoe UI", 10F);
             CurrentWarehouseLabel.Location = new Point(1056, 703);
             CurrentWarehouseLabel.Name = "CurrentWarehouseLabel";
-            CurrentWarehouseLabel.Size = new Size(0, 20);
+            CurrentWarehouseLabel.Size = new Size(0, 23);
             CurrentWarehouseLabel.TabIndex = 19;
             // 
             // WarehousReportForm
@@ -152,8 +165,8 @@
             Controls.Add(FromDateLabel);
             Controls.Add(ReportViewGridView);
             Name = "WarehousReportForm";
-            StartPosition = FormStartPosition.CenterScreen;
-            Text = "WarehousReportForm";
+            StartPosition = FormStartPosition.CenterParent;
+            Text = "Warehous Report";
             WindowState = FormWindowState.Maximized;
             Load += WarehousReportForm_LoadAsync;
             ((System.ComponentModel.ISupportInitialize)ReportViewGridView).EndInit();
