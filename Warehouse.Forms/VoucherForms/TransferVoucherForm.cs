@@ -255,22 +255,29 @@ namespace WarehouseManagmentSystem.WinForms
 
         private void TransferToWarehouseGridView_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
-            if (e.RowIndex >= 0 && e.RowIndex <= TransferToWarehouseGridView.Rows.Count)
+            if (e.RowIndex >= 0 && e.RowIndex < TransferToWarehouseGridView.Rows.Count)
             {
                 var grid = TransferToWarehouseGridView;
-
                 DataGridViewRow editedRow = grid.Rows[e.RowIndex];
+
                 string itemCode = editedRow.Cells["ItemCode"].Value?.ToString();
+                DateOnly? productionDate = editedRow.Cells["ProductionDate"].Value as DateOnly?;
+                DateOnly? expiryDate = editedRow.Cells["ExpiryDate"].Value as DateOnly?;
                 string editedValue = editedRow.Cells["ItemQuantity"].Value?.ToString();
+
+                if (string.IsNullOrEmpty(itemCode) || !productionDate.HasValue || !expiryDate.HasValue)
+                    return;
 
                 if (decimal.TryParse(editedValue, out decimal newQuantity))
                 {
-                    // Lookup the original available quantity from the IssueVoucherItemsGridView
                     decimal availableQuantity = 0;
+
                     foreach (DataGridViewRow originalRow in TransferFromWarehouseGridView.Rows)
                     {
-                        if (originalRow.DataBoundItem is AvailableItemsAtWarehouseDTO originalItem
-                            && originalItem.ItemCode == itemCode)
+                        if (originalRow.DataBoundItem is AvailableItemsAtWarehouseDTO originalItem &&
+                            originalItem.ItemCode == itemCode &&
+                            originalItem.ProductionDate == productionDate &&
+                            originalItem.ExpiryDate == expiryDate)
                         {
                             availableQuantity = originalItem.ItemQuantity;
                             break;
@@ -291,9 +298,8 @@ namespace WarehouseManagmentSystem.WinForms
                 else
                 {
                     MessageBox.Show("Please enter a valid numeric quantity.", "Invalid Input", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    editedRow.Cells["ItemQuantity"].Value = 1; // Default reset
+                    editedRow.Cells["ItemQuantity"].Value = 1;
                 }
-
             }
         }
 
@@ -509,13 +515,6 @@ namespace WarehouseManagmentSystem.WinForms
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
             }
-
-            //if (TransferSupplierComboBox.SelectedIndex == -1)
-            //{
-            //    MessageBox.Show("The supplier must be chosen first", "Validation Error",
-            //        MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            //    return false;
-            //}
 
             if (TransferToWarehouseComboBox.SelectedIndex == -1)
             {
