@@ -83,7 +83,7 @@ namespace WarehouseManagmentSystem.WinForms
         {
             var viewList = InventoryItemViewDTOList.Select(i => new
             {
-                i.Name,
+                i.ItemName,
                 i.Quantity,
                 i.ProductionDate,
                 i.ExpiryDate,
@@ -302,7 +302,7 @@ namespace WarehouseManagmentSystem.WinForms
             {
                 InventoryItemViewDTO inventoryItemViewDTO = new InventoryItemViewDTO();
                 inventoryItemViewDTO.ItemCode = (string)ReceiptVoucherItemsComboBox.SelectedValue;
-                inventoryItemViewDTO.Name = ReceiptVoucherItemsComboBox.Text;
+                inventoryItemViewDTO.ItemName = ReceiptVoucherItemsComboBox.Text;
                 inventoryItemViewDTO.Quantity = int.Parse(ReceiptVoucherQuantityTextBox.Text);
                 inventoryItemViewDTO.ProductionDate = ReceiptVoucherProductionDate.Value;
                 inventoryItemViewDTO.ExpiryDate = ReceiptVoucherExpiryDate.Value;

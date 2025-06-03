@@ -40,7 +40,7 @@
             ReportForWarehousesCheckBoxList.FormattingEnabled = true;
             ReportForWarehousesCheckBoxList.Location = new Point(199, 727);
             ReportForWarehousesCheckBoxList.Name = "ReportForWarehousesCheckBoxList";
-            ReportForWarehousesCheckBoxList.Size = new Size(308, 224);
+            ReportForWarehousesCheckBoxList.Size = new Size(308, 180);
             ReportForWarehousesCheckBoxList.TabIndex = 61;
             ReportForWarehousesCheckBoxList.ItemCheck += ReportForWarehousesCheckBoxList_ItemCheck;
             // 

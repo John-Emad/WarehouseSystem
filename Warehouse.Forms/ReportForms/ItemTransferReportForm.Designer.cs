@@ -44,7 +44,7 @@
             // ReportForWarehousesLabel
             // 
             ReportForWarehousesLabel.AutoSize = true;
-            ReportForWarehousesLabel.Location = new Point(21, 674);
+            ReportForWarehousesLabel.Location = new Point(22, 734);
             ReportForWarehousesLabel.Name = "ReportForWarehousesLabel";
             ReportForWarehousesLabel.Size = new Size(151, 20);
             ReportForWarehousesLabel.TabIndex = 43;
@@ -53,7 +53,7 @@
             // ReportForWarehousesCheckBoxList
             // 
             ReportForWarehousesCheckBoxList.FormattingEnabled = true;
-            ReportForWarehousesCheckBoxList.Location = new Point(224, 661);
+            ReportForWarehousesCheckBoxList.Location = new Point(199, 727);
             ReportForWarehousesCheckBoxList.Name = "ReportForWarehousesCheckBoxList";
             ReportForWarehousesCheckBoxList.Size = new Size(308, 180);
             ReportForWarehousesCheckBoxList.TabIndex = 42;
@@ -62,7 +62,7 @@
             // ToDateLabel
             // 
             ToDateLabel.AutoSize = true;
-            ToDateLabel.Location = new Point(597, 788);
+            ToDateLabel.Location = new Point(570, 855);
             ToDateLabel.Name = "ToDateLabel";
             ToDateLabel.Size = new Size(32, 20);
             ToDateLabel.TabIndex = 41;
@@ -71,7 +71,7 @@
             // FromDateLabel
             // 
             FromDateLabel.AutoSize = true;
-            FromDateLabel.Location = new Point(597, 732);
+            FromDateLabel.Location = new Point(570, 799);
             FromDateLabel.Name = "FromDateLabel";
             FromDateLabel.Size = new Size(81, 20);
             FromDateLabel.TabIndex = 40;
@@ -87,7 +87,7 @@
             // 
             // ActionButton
             // 
-            ActionButton.Location = new Point(1223, 674);
+            ActionButton.Location = new Point(1031, 819);
             ActionButton.Name = "ActionButton";
             ActionButton.Size = new Size(271, 56);
             ActionButton.TabIndex = 36;
@@ -98,7 +98,7 @@
             // WithinRangeDateCheckBox
             // 
             WithinRangeDateCheckBox.AutoSize = true;
-            WithinRangeDateCheckBox.Location = new Point(597, 665);
+            WithinRangeDateCheckBox.Location = new Point(570, 734);
             WithinRangeDateCheckBox.Name = "WithinRangeDateCheckBox";
             WithinRangeDateCheckBox.Size = new Size(157, 24);
             WithinRangeDateCheckBox.TabIndex = 35;
@@ -108,27 +108,31 @@
             // 
             // ReportEndDateDatePicker
             // 
-            ReportEndDateDatePicker.Location = new Point(751, 783);
+            ReportEndDateDatePicker.Location = new Point(724, 850);
             ReportEndDateDatePicker.Name = "ReportEndDateDatePicker";
             ReportEndDateDatePicker.Size = new Size(250, 27);
             ReportEndDateDatePicker.TabIndex = 34;
             // 
             // ReportStartDateDatePicker
             // 
-            ReportStartDateDatePicker.Location = new Point(751, 727);
+            ReportStartDateDatePicker.Location = new Point(724, 794);
             ReportStartDateDatePicker.Name = "ReportStartDateDatePicker";
             ReportStartDateDatePicker.Size = new Size(250, 27);
             ReportStartDateDatePicker.TabIndex = 33;
             // 
             // ReportViewGridView
             // 
+            ReportViewGridView.AllowUserToAddRows = false;
+            ReportViewGridView.AllowUserToDeleteRows = false;
+            ReportViewGridView.AllowUserToOrderColumns = true;
             ReportViewGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             ReportViewGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             ReportViewGridView.Dock = DockStyle.Top;
             ReportViewGridView.Location = new Point(0, 0);
             ReportViewGridView.Name = "ReportViewGridView";
+            ReportViewGridView.ReadOnly = true;
             ReportViewGridView.RowHeadersWidth = 51;
-            ReportViewGridView.Size = new Size(2330, 555);
+            ReportViewGridView.Size = new Size(2330, 654);
             ReportViewGridView.TabIndex = 32;
             ReportViewGridView.CellFormatting += ReportViewGridView_CellFormatting;
             ReportViewGridView.CellPainting += ReportViewGridView_CellPainting;
@@ -151,7 +155,9 @@
             Controls.Add(ReportStartDateDatePicker);
             Controls.Add(ReportViewGridView);
             Name = "ItemTransferReportForm";
-            Text = "ItemTransferReport";
+            StartPosition = FormStartPosition.CenterParent;
+            Text = "Item Transfer Report";
+            WindowState = FormWindowState.Maximized;
             Load += ItemTransferReportForm_Load;
             ((System.ComponentModel.ISupportInitialize)ReportViewGridView).EndInit();
             ResumeLayout(false);

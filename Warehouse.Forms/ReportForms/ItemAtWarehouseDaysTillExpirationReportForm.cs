@@ -9,8 +9,6 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
     public partial class ItemAtWarehouseDaysTillExpirationReportForm : Form
     {
         #region Fields
-        //private int DaysPeriod;
-        //private DateOnly StartReportDate;
         private List<int> SelectedWarehousesIDs = new List<int>();
         #endregion
         public ItemAtWarehouseDaysTillExpirationReportForm()

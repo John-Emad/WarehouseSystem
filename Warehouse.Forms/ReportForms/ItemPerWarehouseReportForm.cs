@@ -65,7 +65,6 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
             ReportEndDateDatePicker.Visible = false;
             FromDateLabel.Visible = false;
             ToDateLabel.Visible = false;
-            CurrentItemLabel.Visible = false;
         }
         #endregion
 
@@ -198,11 +197,7 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
         #region Hide Columns
         private void HideUnnecessaryWarehouseDataColumns()
         {
-            foreach (DataGridViewColumn column in ReportViewGridView.Columns)
-            {
-                column.ReadOnly = true;
-            }
-
+            #region Hide
             if (ReportViewGridView.Columns.Contains("ItemCode"))
                 ReportViewGridView.Columns["ItemCode"].Visible = false;
 
@@ -214,7 +209,6 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
 
             if (ReportViewGridView.Columns.Contains("FromWarehouseId"))
                 ReportViewGridView.Columns["FromWarehouseId"].Visible = false;
-
 
             if (ReportViewGridView.Columns.Contains("MovementType"))
                 ReportViewGridView.Columns["MovementType"].Visible = false;
@@ -231,7 +225,27 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
 
             if (ReportViewGridView.Columns.Contains("IsWarehouseSummary"))
                 ReportViewGridView.Columns["IsWarehouseSummary"].Visible = false;
+            #endregion
 
+            #region Rename
+            if (ReportViewGridView.Columns.Contains("ProductionDate"))
+                ReportViewGridView.Columns["ProductionDate"].HeaderText = "Prod Date";
+
+            if (ReportViewGridView.Columns.Contains("ExpiryDate"))
+                ReportViewGridView.Columns["ExpiryDate"].HeaderText = "Exp Date";
+
+            if (ReportViewGridView.Columns.Contains("FromWarehouseName"))
+                ReportViewGridView.Columns["FromWarehouseName"].HeaderText = "From Warehouse";
+
+            if (ReportViewGridView.Columns.Contains("ToWarehouseName"))
+                ReportViewGridView.Columns["ToWarehouseName"].HeaderText = "To Warehouse";
+
+            if (ReportViewGridView.Columns.Contains("Quantity"))
+                ReportViewGridView.Columns["Quantity"].HeaderText = "Quantity Moved";
+
+            if (ReportViewGridView.Columns.Contains("RelatedPerson"))
+                ReportViewGridView.Columns["RelatedPerson"].HeaderText = "Related Person (Supp-Cust)";
+            #endregion
         }
         #endregion
 
@@ -239,6 +253,7 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
         {
             if(IsValidItemsReport())
             {
+                CurrentItemLabel.Text = ReportForItemsComboBox.Text;
                 ReportChosenItemAtChosenWarehouses();
             }
         }
@@ -316,7 +331,7 @@ namespace WarehouseManagmentSystem.WinForms.ReportForms
                         string summaryText;
                         if (item.IsWarehouseSummary)
                         {
-                            summaryText = $"🏭 {item.Warehouse}  |   📦 {item.CurrentQuantity} in stock";
+                            summaryText = $"🏭 WAREHOUSE: {item.Warehouse.ToUpper()}  |   📦 {item.CurrentQuantity} • in stock";
                         }
                         else
                         {

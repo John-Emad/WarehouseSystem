@@ -92,7 +92,7 @@
             Controls.Add(ActionButton);
             Controls.Add(ReportViewGridView);
             Name = "ItemAtWarehouseSincePeriodReportForm";
-            Text = "Entered warehouse Report";
+            Text = "Entered Warehouse Since Report";
             Load += ItemAtWarehouseSincePeriodReportForm_Load;
             ((System.ComponentModel.ISupportInitialize)ReportViewGridView).EndInit();
             ResumeLayout(false);
