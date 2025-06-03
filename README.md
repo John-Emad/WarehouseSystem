@@ -40,7 +40,7 @@ View detailed operational insights through the following reports:
 ## 💡 Getting Started
 
 1. Clone the repository.
-2. Configure your connection string in `appsettings.json` or directly within the DbContext if required.
+2. Configure your connection string.
 3. Build and run the solution in Visual Studio.
 
 ## 📂 Project Structure
